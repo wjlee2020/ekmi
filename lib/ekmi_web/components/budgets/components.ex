@@ -11,13 +11,13 @@ defmodule EkmiWeb.Budgets.Components do
       3 -> "🏠"
       4 -> "💡"
       5 -> "🌃"
-      6 -> "🤿"
+      6 -> "𖧢"
     end
     ~H"""
     <div style={"--detail: #{@budget.category.id}"} class="w-[23rem]">
       <a href="#" class="h-[200px] flex flex-col justify-between budget-card block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-          <%= @budget.title %>
+          <%= String.capitalize(@budget.title) %>
           <%= emoji %>
         </h5>
 

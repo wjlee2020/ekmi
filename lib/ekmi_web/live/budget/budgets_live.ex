@@ -19,7 +19,7 @@ defmodule EkmiWeb.BudgetsLive do
     sort_order = valid_sort_order(params)
 
     page = param_to_integer(params["page"], 1)
-    per_page = param_to_integer(params["per_page"], 10)
+    per_page = param_to_integer(params["per_page"], 9)
 
     options = %{sort_by: sort_by, sort_order: sort_order, page: page, per_page: per_page}
 
@@ -27,7 +27,7 @@ defmodule EkmiWeb.BudgetsLive do
     finance = Accounts.get_finance(%{user_id: socket.assigns.current_user.id})
     total_budget_cost = Enum.reduce(budgets, 0, fn budget, acc -> acc + budget.cost end)
     remaining_balance = finance.balance - total_budget_cost
-    socket = assign(socket, budgets: budgets, options: options, budgets_count: Keihi.budgets_count(), balance: remaining_balance)
+    socket = assign(socket, budgets: budgets, options: options, budgets_count: Keihi.budgets_count(), balance: finance.balance, remaining_balance: remaining_balance)
 
     {:noreply, socket}
   end

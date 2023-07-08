@@ -6,3 +6,7 @@
 .active {
   border-bottom: 2px solid;
 }
+
+.animated-width {
+  transition: width 0.5s ease-out;
+}
