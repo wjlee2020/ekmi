@@ -1,4 +1,4 @@
-defmodule Ekmi.Category do
+defmodule Ekmi.Keihi.Category do
   use Ecto.Schema
   import Ecto.Changeset
 

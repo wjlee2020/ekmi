@@ -9,3 +9,18 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+alias Ekmi.Repo
+alias Ekmi.Keihi.Category
+
+[
+  "Groceries/Food",
+  "Transportation",
+  "Rent",
+  "Utilities",
+  "Entertainment",
+  "Misc./Hobby"
+]
+|> Enum.each(fn name ->
+  %Category{name: name}
+  |> Repo.insert!()
+end)
