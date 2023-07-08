@@ -5,11 +5,20 @@ defmodule EkmiWeb.Budgets.Components do
 
   attr :budget, Budget
   def tiles(assigns) do
+    emoji = case assigns.budget.category.id do
+      1 -> "🍛"
+      2 -> "⛽️"
+      3 -> "🏠"
+      4 -> "💡"
+      5 -> "🌃"
+      6 -> "🤿"
+    end
     ~H"""
     <div style={"--detail: #{@budget.category.id}"} class="w-[23rem]">
       <a href="#" class="h-[200px] flex flex-col justify-between budget-card block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           <%= @budget.title %>
+          <%= emoji %>
         </h5>
 
         <h6 class="mb-2 text-1xl font-bold tracking-tight text-gray-900 dark:text-white overflow-scroll">
