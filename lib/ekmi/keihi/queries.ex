@@ -15,4 +15,20 @@ defmodule Ekmi.Keihi.Queries do
       where: b.user_id == ^user_id,
       preload: [:category]
   end
+
+  def paginate(query, %{page: page, per_page: per_page}) do
+    offset = max((page - 1) * per_page, 0)
+
+    query
+    |> limit(^per_page)
+    |> offset(^offset)
+  end
+
+  def paginate(query, _options), do: query
+
+  def sort(query, %{sort_by: sort_by, sort_order: sort_order}) do
+    order_by(query, {^sort_order, ^sort_by})
+  end
+
+  def sort(query, _options), do: query
 end

@@ -11,7 +11,7 @@
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body class="bg-white antialiased">
+  <body class="bg-slate-200 antialiased">
     <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
       <%= if @current_user do %>
         <li class="text-[0.8125rem] leading-6 text-zinc-900">
@@ -20,7 +20,7 @@
 
         <li class="text-[0.8125rem] leading-6 text-zinc-900">
           <.link
-            href={~p"/"}
+            href={~p"/budgets"}
             class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
           >
             Home
@@ -64,6 +64,7 @@
         </li>
       <% end %>
     </ul>
+
     <%= @inner_content %>
   </body>
 </html>
