@@ -97,10 +97,10 @@ defmodule EkmiWeb.BudgetsLive do
   defp valid_sort_by(%{"sort_by" => sort_by}) when sort_by in ~w(category_id cost inserted_at) do
     String.to_atom(sort_by)
   end
-  defp valid_sort_by(_params), do: :id
+  defp valid_sort_by(_params), do: :inserted_at
 
   defp valid_sort_order(%{"sort_order" => sort_order}) when sort_order in ~w(asc desc) do
     String.to_atom(sort_order)
   end
-  defp valid_sort_order(_params), do: :asc
+  defp valid_sort_order(_params), do: :desc
 end

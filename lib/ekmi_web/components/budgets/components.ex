@@ -1,6 +1,7 @@
 defmodule EkmiWeb.Budgets.Components do
   use Phoenix.Component
 
+  alias Ekmi.Cldr
   alias Ekmi.Keihi.Budget
 
   attr :budget, Budget
@@ -35,6 +36,27 @@ defmodule EkmiWeb.Budgets.Components do
           </p>
         </div>
       </a>
+    </div>
+    """
+  end
+
+  attr :balance, :integer, required: true
+  attr :remaining_balance, :integer, required: true
+  def monthly_balance(assigns) do
+    {:ok, balance} = Cldr.Number.to_string(assigns.balance)
+    {:ok, remaining_balance} = Cldr.Number.to_string(assigns.remaining_balance)
+
+    ~H"""
+    <div class="flex gap-4">
+      <span>
+        Remaining Balance:
+        <%= remaining_balance %> 円
+      </span>
+
+      <span>
+        Total Balance:
+        <%= balance %> 円
+      </span>
     </div>
     """
   end

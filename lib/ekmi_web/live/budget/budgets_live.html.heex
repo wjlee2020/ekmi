@@ -1,15 +1,5 @@
 <h1 class="text-3xl font-bold">Hello <%= @username %>!</h1>
-<div class="flex gap-4">
-  <span>
-    Total Balance:
-    <%= @balance %>
-  </span>
-
-  <span>
-    Remaining Balance:
-    <%= @remaining_balance %>
-  </span>
-</div>
+<Budgets.Components.monthly_balance balance={@balance} remaining_balance={@remaining_balance} />
 
 <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
   <div class="animated-width bg-green-600 h-2.5 rounded-full dark:bg-green-500" style={"width: #{@remaining_balance / @balance * 100}%"}></div>
