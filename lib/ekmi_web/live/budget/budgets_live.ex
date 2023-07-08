@@ -3,18 +3,19 @@ defmodule EkmiWeb.BudgetsLive do
 
   alias Ekmi.Accounts
   alias Ekmi.Keihi
-  alias EkmiWeb.Budgets
+  alias EkmiWeb.{Budgets, BudgetsFormComponent}
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     [username, _domain] = String.split(socket.assigns.current_user.email, "@")
-    socket = assign(socket, username: String.capitalize(username))
+    socket = assign(socket, username: String.capitalize(username), user_id: socket.assigns.current_user.id )
 
     {:ok, socket}
   end
 
   @impl true
   def handle_params(params, _uri, socket) do
+    user_id = socket.assigns.current_user.id
     sort_by = valid_sort_by(params)
     sort_order = valid_sort_order(params)
 
@@ -23,9 +24,9 @@ defmodule EkmiWeb.BudgetsLive do
 
     options = %{sort_by: sort_by, sort_order: sort_order, page: page, per_page: per_page}
 
-    budgets = Keihi.list_budgets(%{user_id: socket.assigns.current_user.id}, options)
+    budgets = Keihi.list_budgets(%{user_id: user_id}, options)
+    total_budget_cost = Keihi.get_total_budget_cost(%{user_id: user_id})
     finance = Accounts.get_finance(%{user_id: socket.assigns.current_user.id})
-    total_budget_cost = Enum.reduce(budgets, 0, fn budget, acc -> acc + budget.cost end)
     remaining_balance = finance.balance - total_budget_cost
     socket = assign(socket, budgets: budgets, options: options, budgets_count: Keihi.budgets_count(), balance: finance.balance, remaining_balance: remaining_balance)
 

@@ -33,4 +33,9 @@ defmodule Ekmi.Keihi do
   def budgets_count do
     Repo.aggregate(Budget, :count, :id)
   end
+
+  def get_total_budget_cost(params) do
+    list_budgets(params)
+    |> Enum.reduce(0, fn budget, acc -> acc + budget.cost end)
+  end
 end

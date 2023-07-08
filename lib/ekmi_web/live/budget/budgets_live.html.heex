@@ -1,3 +1,18 @@
+<.modal
+  :if={@live_action in [:new, :edit]}
+  show
+  on_cancel={JS.patch(~p"/budgets")}
+  id="confirm-modal"
+>
+  <.live_component
+    module={BudgetsFormComponent}
+    id={:new}
+    live_action={@live_action}
+    balance={@balance}
+    user_id={@user_id}
+  />
+</.modal>
+
 <h1 class="text-3xl font-bold">Hello <%= @username %>!</h1>
 <Budgets.Components.monthly_balance balance={@balance} remaining_balance={@remaining_balance} />
 
@@ -21,23 +36,24 @@
   </.sort_link>
 </div>
 
-<div class="py-4 flex flex-wrap gap-2">
+<div class="py-4 flex flex-wrap gap-2 h-[650px]">
   <div :for={budget <- @budgets}>
-    <Budgets.Components.tiles budget={budget} />
+    <.link patch={~p"/budgets/#{budget}"}>
+      <Budgets.Components.tiles budget={budget} />
+    </.link>
   </div>
 </div>
 
-<div class="flex items-center gap-2">
+<div class="mb-4 flex items-center justify-center gap-2">
   <.link
     :if={@options.page > 1}
-    class="flex items-center justify-center px-3 h-8 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+    class="flex items-center justify-center px-3 h-8 text-sm font-medium text-slate-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-slate-200 dark:hover:bg-gray-700 dark:hover:text-white"
     patch={~p"/budgets?#{%{@options | page: @options.page - 1}}"}
   >
     Prev
   </.link>
 
   <.link
-    :if={more_pages?(@options, @budgets_count)}
     :for={{page_number, current_page?} <- pages(@options, @budgets_count)}
     class={if current_page?, do: "active"}
     patch={~p"/budgets?#{%{@options | page: page_number}}"}
@@ -47,7 +63,7 @@
 
   <.link
     :if={more_pages?(@options, @budgets_count)}
-    class="flex items-center justify-center px-3 h-8 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+    class="flex items-center justify-center px-3 h-8 text-sm font-medium text-slate-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-slate-200 dark:hover:bg-gray-700 dark:hover:text-white"
     patch={~p"/budgets?#{%{@options | page: @options.page + 1}}"}
   >
     Next
@@ -70,3 +86,10 @@
     </form>
   </div>
 </div>
+
+<.link
+  patch={~p"/budgets/new"}
+  class="py-2.5 px-5 mb-2 float-right text-sm font-medium text-slate-200 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-slate-200 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+>
+  Add a budget
+</.link>

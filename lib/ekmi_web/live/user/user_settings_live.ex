@@ -19,7 +19,7 @@ defmodule EkmiWeb.UserSettingsLive do
           phx-change="validate_balance"
         >
           <.input field={@finance_form[:balance]} type="number" label="Your Balance" required />
-          <.input field={@finance_form[:currency]} type="text" label="Currency" required />
+          <.input field={@finance_form[:currency]} type="select" label="Currency" required options={["USD", "JPY"]} />
           <.input field={@finance_form[:user_id]} type="hidden" />
 
           <:actions>
