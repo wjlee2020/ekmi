@@ -5,6 +5,8 @@ defmodule Ekmi.Keihi.Category do
   schema "categories" do
     field :name, :string
 
+    has_many :budgets, Ekmi.Keihi.Budget
+
     timestamps()
   end
 
