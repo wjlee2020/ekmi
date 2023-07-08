@@ -17,6 +17,16 @@
         <li class="text-[0.8125rem] leading-6 text-zinc-900">
           <%= @current_user.email %>
         </li>
+
+        <li class="text-[0.8125rem] leading-6 text-zinc-900">
+          <.link
+            href={~p"/"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Home
+          </.link>
+        </li>
+
         <li>
           <.link
             href={~p"/users/settings"}
@@ -25,6 +35,7 @@
             Settings
           </.link>
         </li>
+
         <li>
           <.link
             href={~p"/users/log_out"}
