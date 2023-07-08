@@ -1,6 +1,7 @@
 defmodule EkmiWeb.BudgetsLive do
   use EkmiWeb, :live_view
 
+  alias Ekmi.Accounts
   alias Ekmi.Keihi
   alias EkmiWeb.Budgets
 
@@ -23,7 +24,10 @@ defmodule EkmiWeb.BudgetsLive do
     options = %{sort_by: sort_by, sort_order: sort_order, page: page, per_page: per_page}
 
     budgets = Keihi.list_budgets(%{user_id: socket.assigns.current_user.id}, options)
-    socket = assign(socket, budgets: budgets, options: options, budgets_count: Keihi.budgets_count())
+    finance = Accounts.get_finance(%{user_id: socket.assigns.current_user.id})
+    total_budget_cost = Enum.reduce(budgets, 0, fn budget, acc -> acc + budget.cost end)
+    remaining_balance = finance.balance - total_budget_cost
+    socket = assign(socket, budgets: budgets, options: options, budgets_count: Keihi.budgets_count(), balance: remaining_balance)
 
     {:noreply, socket}
   end

@@ -8,6 +8,8 @@ defmodule Ekmi.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
+    has_one :finance, Ekmi.Accounts.Finance
+
     timestamps()
   end
 

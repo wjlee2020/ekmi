@@ -13,6 +13,23 @@ defmodule EkmiWeb.UserSettingsLive do
     <div class="space-y-12 divide-y">
       <div>
         <.simple_form
+          for={@finance_form}
+          id="balance_form"
+          phx-submit="update_balance"
+          phx-change="validate_balance"
+        >
+          <.input field={@finance_form[:balance]} type="number" label="Your Balance" required />
+          <.input field={@finance_form[:currency]} type="text" label="Currency" required />
+          <.input field={@finance_form[:user_id]} type="hidden" />
+
+          <:actions>
+            <.button phx-disable-with="Changing...">Change Balance</.button>
+          </:actions>
+        </.simple_form>
+      </div>
+
+      <div>
+        <.simple_form
           for={@email_form}
           id="email_form"
           phx-submit="update_email"
@@ -33,6 +50,7 @@ defmodule EkmiWeb.UserSettingsLive do
           </:actions>
         </.simple_form>
       </div>
+
       <div>
         <.simple_form
           for={@password_form}
@@ -90,6 +108,8 @@ defmodule EkmiWeb.UserSettingsLive do
     user = socket.assigns.current_user
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
+    finance = Accounts.get_finance(%{user_id: user.id})
+    finance_changeset = Accounts.change_finance(finance)
 
     socket =
       socket
@@ -98,7 +118,9 @@ defmodule EkmiWeb.UserSettingsLive do
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
+      |> assign(:finance_form, to_form(finance_changeset))
       |> assign(:trigger_submit, false)
+      |> assign(:balance, finance.balance)
 
     {:ok, socket}
   end
@@ -113,6 +135,35 @@ defmodule EkmiWeb.UserSettingsLive do
       |> to_form()
 
     {:noreply, assign(socket, email_form: email_form, email_form_current_password: password)}
+  end
+
+  def handle_event("validate_balance", params, socket) do
+    %{"finance" => finance_params} = params
+    finance_form =
+      %Accounts.Finance{}
+      |> Accounts.change_finance(finance_params)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, finance_form: finance_form, balance: finance_params["balance"])}
+  end
+
+  def handle_event("update_balance", params, socket) do
+    %{"finance" => finance_params} = params
+
+    case Accounts.update_finance(finance_params["user_id"], finance_params) do
+      {:ok, finance} ->
+        finance_changeset = Accounts.change_finance(finance)
+        socket =
+          socket
+          |> put_flash(:info, "Updated your balance!")
+          |> assign(finance_form: to_form(finance_changeset))
+
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, finance_form: to_form(changeset))}
+    end
   end
 
   def handle_event("update_email", params, socket) do

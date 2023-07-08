@@ -6,7 +6,7 @@ defmodule Ekmi.Accounts do
   import Ecto.Query, warn: false
   alias Ekmi.Repo
 
-  alias Ekmi.Accounts.{User, UserToken, UserNotifier}
+  alias Ekmi.Accounts.{Finance, User, UserToken, UserNotifier}
 
   ## Database getters
 
@@ -349,5 +349,25 @@ defmodule Ekmi.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  def create_finance(attrs) do
+    %Finance{}
+    |> change_finance(attrs)
+    |> Repo.insert()
+  end
+
+  def update_finance(user_id, attrs \\ %{}) do
+    get_finance(%{user_id: user_id})
+    |> Finance.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def get_finance(%{user_id: user_id}) do
+    Repo.get_by(Finance, user_id: user_id)
+  end
+
+  def change_finance(%Finance{} = finance, attr \\ %{}) do
+    Finance.changeset(finance, attr)
   end
 end
