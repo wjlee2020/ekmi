@@ -47,17 +47,6 @@ defmodule EkmiWeb.BudgetsLive do
       <.sort_link sort_by={:inserted_at} options={@options}>
         Created
       </.sort_link>
-
-      <form class="ml-auto" phx-change="select-per-page">
-        <select class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm text-center inline-flex items-center dark:bg-blue-700 dark:hover:bg-blue-900 dark:focus:ring-blue-900" name="per-page">
-          <%= Phoenix.HTML.Form.options_for_select(
-            [10, 15, 20, 25],
-            @options.per_page
-          ) %>
-        </select>
-
-        <label for="per-page">Per-Page</label>
-      </form>
     </div>
 
     <div class="py-4 flex flex-wrap gap-2">
@@ -67,7 +56,11 @@ defmodule EkmiWeb.BudgetsLive do
     </div>
 
     <div class="flex items-center gap-2">
-      <.link :if={@options.page > 1} class="flex items-center justify-center px-3 h-8 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" patch={~p"/budgets?#{%{@options | page: @options.page - 1}}"}>
+      <.link
+        :if={@options.page > 1}
+        class="flex items-center justify-center px-3 h-8 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+        patch={~p"/budgets?#{%{@options | page: @options.page - 1}}"}
+      >
         Prev
       </.link>
 
@@ -80,9 +73,30 @@ defmodule EkmiWeb.BudgetsLive do
         <%= page_number %>
       </.link>
 
-      <.link :if={more_pages?(@options, @budgets_count)} class="flex items-center justify-center px-3 h-8 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" patch={~p"/budgets?#{%{@options | page: @options.page + 1}}"}>
+      <.link
+        :if={more_pages?(@options, @budgets_count)}
+        class="flex items-center justify-center px-3 h-8 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+        patch={~p"/budgets?#{%{@options | page: @options.page + 1}}"}
+      >
         Next
       </.link>
+
+      <div class="flex items-center gap-4 ml-auto">
+        <span>
+          Total: <%= @budgets_count %>
+        </span>
+
+        <form phx-change="select-per-page">
+          <label for="per-page">Per-Page</label>
+
+          <select class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm text-center inline-flex items-center dark:bg-gray-800 dark:hover:bg-gray-700" name="per-page">
+            <%= Phoenix.HTML.Form.options_for_select(
+              [10, 15, 20, 25],
+              @options.per_page
+            ) %>
+          </select>
+        </form>
+      </div>
     </div>
     """
   end
