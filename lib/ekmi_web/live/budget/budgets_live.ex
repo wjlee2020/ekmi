@@ -64,18 +64,25 @@ defmodule EkmiWeb.BudgetsLive do
       <div :for={budget <- @budgets}>
         <Budgets.Components.tiles budget={budget} />
       </div>
+    </div>
 
-      <div class="footer">
-        <div class="pagination">
-          <.link :if={@options.page > 1} patch={~p"/budgets?#{%{@options | page: @options.page - 1}}"}>
-            Previous
-          </.link>
+    <div class="flex items-center gap-2">
+      <.link :if={@options.page > 1} class="flex items-center justify-center px-3 h-8 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" patch={~p"/budgets?#{%{@options | page: @options.page - 1}}"}>
+        Prev
+      </.link>
 
-          <.link :if={more_pages?(@options, @budgets_count)} patch={~p"/budgets?#{%{@options | page: @options.page + 1}}"}>
-            Next
-          </.link>
-        </div>
-      </div>
+      <.link
+        :if={more_pages?(@options, @budgets_count)}
+        :for={{page_number, current_page?} <- pages(@options, @budgets_count)}
+        class={if current_page?, do: "active"}
+        patch={~p"/budgets?#{%{@options | page: page_number}}"}
+      >
+        <%= page_number %>
+      </.link>
+
+      <.link :if={more_pages?(@options, @budgets_count)} class="flex items-center justify-center px-3 h-8 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" patch={~p"/budgets?#{%{@options | page: @options.page + 1}}"}>
+        Next
+      </.link>
     </div>
     """
   end
@@ -99,14 +106,26 @@ defmodule EkmiWeb.BudgetsLive do
     """
   end
 
-  defp more_pages?(options, donation_count) do
-    options.page * options.per_page < donation_count
+  defp more_pages?(options, budgets_count) do
+    options.page * options.per_page < budgets_count
   end
 
   defp next_sort_order(sort_order) do
     case sort_order do
       :asc -> :desc
       :desc -> :asc
+    end
+  end
+
+  defp pages(options, budgets_count) do
+    page_count = ceil(budgets_count / options.per_page)
+
+    for page_number <- (options.page - 2)..(options.page + 2),
+        page_number > 0 do
+      if page_number <= page_count do
+        current_page? = page_number == options.page
+        {page_number, current_page?}
+      end
     end
   end
 
