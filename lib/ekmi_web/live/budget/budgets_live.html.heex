@@ -33,21 +33,15 @@
     Cost
   </.sort_link>
 
-  <.sort_link sort_by={:inserted_at} options={@options}>
+  <.sort_link sort_by={:created_at} options={@options}>
     Created
   </.sort_link>
 </div>
 
-<div class="py-4 flex flex-wrap gap-2 h-[650px]">
-  <%= if !Enum.empty?(@budgets) do %>
-    <div :for={budget <- @budgets}>
-      <.link patch={~p"/budgets/#{budget}?#{@options}"}>
-        <Budgets.Components.tiles budget={budget} />
-      </.link>
-    </div>
-  <% else %>
-    <p class="m-auto">Saving money I see...👀</p>
-  <% end %>
+<div id="budgets" phx-update="stream" class="py-4 flex flex-wrap gap-2">
+  <.link :for={{budget_id, budget} <- @streams.budgets} id={budget_id} patch={~p"/budgets/#{budget}?#{@options}"}>
+    <Budgets.Components.tiles budget={budget} />
+  </.link>
 </div>
 
 <div class="mb-4 flex items-center justify-center gap-2">

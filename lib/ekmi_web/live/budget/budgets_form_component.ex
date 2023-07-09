@@ -1,7 +1,7 @@
 defmodule EkmiWeb.BudgetsFormComponent do
   use EkmiWeb, :live_component
 
-  alias Ekmi.Keihi
+  alias Ekmi.{Keihi, Repo}
   alias Ekmi.Keihi.Budget
 
   @impl Phoenix.LiveComponent
@@ -51,11 +51,11 @@ defmodule EkmiWeb.BudgetsFormComponent do
           <.input label="Date" field={@budget_form[:created_at]} value={@selected_budget.created_at} type="date" autocomplete="off" />
           <.input label="Description" field={@budget_form[:description]} value={@selected_budget.description} type="textarea" placeholder="Budget Description" autocomplete="off" />
 
-          <.button class="mt-2" phx-disable-with="Updating...">Update</.button>
+          <.button class="mt-2" phx-disable-with="Loading...">Update</.button>
 
           <.button
             phx-click="delete"
-            phx-disable-with="Deleting..."
+            phx-disable-with="Loading..."
             phx-target={@myself}
             phx-value-id={@selected_budget.id}
             data-confirm="Are you sure?"
@@ -72,11 +72,9 @@ defmodule EkmiWeb.BudgetsFormComponent do
   @impl true
   def handle_event("save", %{"budget" => budget}, socket) do
     case Keihi.create_budget(budget) do
-      {:ok, _budget} ->
-        socket =
-          socket
-          |> put_flash(:info, "Added a new budget!")
-          |> push_patch(to: ~p"/budgets")
+      {:ok, budget} ->
+        Repo.preload(budget, :category)
+        send(self(), {:budget_created, budget})
 
         {:noreply, socket}
 
@@ -106,8 +104,6 @@ defmodule EkmiWeb.BudgetsFormComponent do
         {:noreply, socket}
 
       {:error, changeset} ->
-        IO.inspect(changeset, label: "CHANGESET")
-
         budget_form =
           changeset
           |> Map.put(:action, :validate)
@@ -123,12 +119,13 @@ defmodule EkmiWeb.BudgetsFormComponent do
   end
 
   def handle_event("delete", %{"id" => budget_id}, socket) do
-    Keihi.delete_budget(budget_id)
+    {:ok, budget} = Keihi.delete_budget(budget_id)
+    send(self(), {:budget_deleted, budget})
 
-    socket =
-      socket
-      |> put_flash(:info, "Deleted budget")
-      |> push_patch(to: ~p"/budgets")
+    # socket =
+    #   socket
+    #   |> put_flash(:info, "Deleted budget")
+    #   |> push_patch(to: ~p"/budgets")
     {:noreply, socket}
   end
 

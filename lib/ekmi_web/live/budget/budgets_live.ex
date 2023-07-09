@@ -35,7 +35,15 @@ defmodule EkmiWeb.BudgetsLive do
     balance = finance.balance
     remaining_balance = balance - total_budget_cost
     bal_percentage = remaining_balance / balance * 100
-    socket = assign(socket, budgets: budgets, selected_budget: selected_budget, options: options, budgets_count: Keihi.budgets_count(), balance: balance, remaining_balance: remaining_balance, bal_percentage: bal_percentage)
+    socket =
+      socket
+      |> stream(:budgets, budgets)
+      |> assign(:selected_budget, selected_budget)
+      |> assign(:budgets_count, Keihi.budgets_count())
+      |> assign(:balance, balance)
+      |> assign(:remaining_balance, remaining_balance)
+      |> assign(:bal_percentage, bal_percentage)
+      |> assign(:options, options)
 
     {:noreply, socket}
   end
@@ -47,12 +55,34 @@ defmodule EkmiWeb.BudgetsLive do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_info({:budget_created, budget}, socket) do
+    socket =
+      socket
+      |> stream_insert(:budgets, budget, at: 0)
+      |> put_flash(:info, "Created budget!")
+      |> push_navigate(to: ~p"/budgets")
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:budget_deleted, budget}, socket) do
+    socket =
+      socket
+      |> stream_delete(:budgets, budget)
+      |> put_flash(:info, "Deleted budget!")
+      |> push_navigate(to: ~p"/budgets")
+
+    {:noreply, socket}
+  end
+
   attr :sort_by, :atom, required: true
   attr :options, :map, required: true
   slot :inner_block, required: true
   def sort_link(assigns) do
     ~H"""
-    <.link class="px-4 w-32 text-center" patch={~p"/budgets?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"}>
+    <.link class="px-4 w-32 text-center" navigate={~p"/budgets?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"}>
       <%= render_slot(@inner_block) %>
       <%= sort_indicator(@sort_by, @options) %>
     </.link>
