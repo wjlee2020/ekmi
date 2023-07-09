@@ -39,9 +39,11 @@ defmodule EkmiWeb.BudgetsFormComponent do
           for={@budget_form}
           class="flex flex-col gap-2 mt-2"
           phx-change="validate"
-          phx-submit="save"
+          phx-submit="update"
           phx-target={@myself}
         >
+          <.input type="hidden" field={@budget_form[:user_id]} value={@user_id} />
+          <.input type="hidden" field={@budget_form[:id]} value={@selected_budget.id} />
           <.input label="Title" field={@budget_form[:title]} value={String.capitalize(@selected_budget.title)} placeholder="Budget Title" autocomplete="off" />
           <.input label="Description" field={@budget_form[:description]} value={@selected_budget.description} type="textarea" placeholder="Budget Description" autocomplete="off" />
           <.input label="Cost" field={@budget_form[:cost]} value={@selected_budget.cost} type="number" placeholder="Cost" autocomplete="off" />
@@ -92,8 +94,30 @@ defmodule EkmiWeb.BudgetsFormComponent do
   end
 
   def handle_event("update", %{"budget" => budget}, socket) do
-    IO.inspect(budget)
-    {:noreply, socket}
+    case Keihi.update_budget(socket.assigns.selected_budget, budget) do
+      {:ok, _budget} ->
+        socket =
+          socket
+          |> put_flash(:info, "Updated budget!")
+          |> push_patch(to: ~p"/budgets")
+
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        IO.inspect(changeset, label: "CHANGESET")
+
+        budget_form =
+          changeset
+          |> Map.put(:action, :validate)
+          |> to_form()
+
+        socket =
+          socket
+          |> put_flash(:error, "Failed to create budget")
+          |> assign(budget_form: budget_form)
+
+        {:noreply, socket}
+    end
   end
 
   def handle_event("delete", %{"id" => budget_id}, socket) do

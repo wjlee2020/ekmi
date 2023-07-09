@@ -15,6 +15,12 @@ defmodule Ekmi.Keihi do
     |> Repo.delete()
   end
 
+  def update_budget(selected_budget, attrs \\ %{}) do
+    selected_budget
+    |> change_budget(attrs)
+    |> Repo.update()
+  end
+
   def list_budgets(%{user_id: user_id}) do
     Queries.where_user(%{user_id: user_id})
     |> Repo.all()
