@@ -7,7 +7,7 @@ defmodule EkmiWeb.UserSettingsLive do
     ~H"""
     <.header class="text-center">
       Account Settings
-      <:subtitle>Manage your account email address and password settings</:subtitle>
+      <:subtitle>Manage your balance, email, and password</:subtitle>
     </.header>
 
     <div class="space-y-12 divide-y lg:w-[600px] mx-auto">

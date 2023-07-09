@@ -1,7 +1,8 @@
 <main class="px-4 py-20 sm:px-6 lg:px-8">
   <div class="mx-auto w-[1200px] ">
     <.flash_group flash={@flash} />
-    <.live_component module={EkmiWeb.Nav.SidebarLive} id={:sidebar} />
+
+    <.live_component module={EkmiWeb.Nav.SidebarLive} id={:sidebar} current_user={@current_user} />
 
     <%= @inner_content %>
   </div>
