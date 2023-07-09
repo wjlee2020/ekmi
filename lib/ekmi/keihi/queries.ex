@@ -26,6 +26,14 @@ defmodule Ekmi.Keihi.Queries do
 
   def paginate(query, _options), do: query
 
+  def records_for_month(query, %{year: year, month: month}) do
+    from(r in query,
+      where: fragment("date_trunc('month', ?) = date ?", r.inserted_at, ^"#{year}-#{month}-01")
+    )
+  end
+
+  def records_for_month(query, _options), do: query
+
   def sort(query, %{sort_by: sort_by, sort_order: sort_order}) do
     order_by(query, {^sort_order, ^sort_by})
   end

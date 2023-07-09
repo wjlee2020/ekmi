@@ -28,7 +28,7 @@ defmodule EkmiWeb.Budgets.Components do
 
       <div class="flex justify-between gap-4">
         <p class="font-normal text-gray-700 dark:text-gray-400 text-end">
-          <%= Date.to_iso8601(@budget.inserted_at) %>
+          <%= @budget.created_at %>
         </p>
 
         <p class="font-normal text-gray-700 dark:text-gray-400 text-end">

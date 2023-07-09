@@ -26,9 +26,10 @@ defmodule EkmiWeb.BudgetsFormComponent do
         >
           <.input type="hidden" field={@budget_form[:user_id]} value={@user_id} />
           <.input label="Title" field={@budget_form[:title]} placeholder="Budget Title" autocomplete="off" />
-          <.input label="Description" field={@budget_form[:description]} type="textarea" placeholder="Budget Description" autocomplete="off" />
-          <.input label="Cost" field={@budget_form[:cost]} type="number" placeholder="Cost" autocomplete="off" />
           <.input label="Category" field={@budget_form[:category_id]} type="select" options={[{"Grocery/Food", 1}, {"Transportation", 2}, {"Rent", 3}, {"Utilities", 4}, {"Entertainment", 5}, {"Misc./Hobby", 6}]} />
+          <.input label="Cost" field={@budget_form[:cost]} type="number" placeholder="Cost" autocomplete="off" />
+          <.input label="Date" field={@budget_form[:created_at]} type="date" autocomplete="off" />
+          <.input label="Description" field={@budget_form[:description]} type="textarea" placeholder="Budget Description" autocomplete="off" />
 
           <.button class="mt-2">Add</.button>
         </.form>
@@ -45,9 +46,10 @@ defmodule EkmiWeb.BudgetsFormComponent do
           <.input type="hidden" field={@budget_form[:user_id]} value={@user_id} />
           <.input type="hidden" field={@budget_form[:id]} value={@selected_budget.id} />
           <.input label="Title" field={@budget_form[:title]} value={String.capitalize(@selected_budget.title)} placeholder="Budget Title" autocomplete="off" />
-          <.input label="Description" field={@budget_form[:description]} value={@selected_budget.description} type="textarea" placeholder="Budget Description" autocomplete="off" />
-          <.input label="Cost" field={@budget_form[:cost]} value={@selected_budget.cost} type="number" placeholder="Cost" autocomplete="off" />
           <.input label="Category" field={@budget_form[:category_id]} value={@selected_budget.category_id} type="select" options={[{"Grocery/Food", 1}, {"Transportation", 2}, {"Rent", 3}, {"Utilities", 4}, {"Entertainment", 5}, {"Misc./Hobby", 6}]} />
+          <.input label="Cost" field={@budget_form[:cost]} value={@selected_budget.cost} type="number" placeholder="Cost" autocomplete="off" />
+          <.input label="Date" field={@budget_form[:created_at]} value={@selected_budget.created_at} type="date" autocomplete="off" />
+          <.input label="Description" field={@budget_form[:description]} value={@selected_budget.description} type="textarea" placeholder="Budget Description" autocomplete="off" />
 
           <.button class="mt-2" phx-disable-with="Updating...">Update</.button>
 

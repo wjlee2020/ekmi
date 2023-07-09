@@ -30,6 +30,7 @@ defmodule Ekmi.Keihi do
     Queries.where_user(%{user_id: user_id})
     |> Queries.sort(options)
     |> Queries.paginate(options)
+    |> Queries.records_for_month(options)
     |> Repo.all()
   end
 
