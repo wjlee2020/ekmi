@@ -10,6 +10,11 @@ defmodule Ekmi.Keihi do
     |> Repo.insert()
   end
 
+  def delete_budget(budget_id) do
+    find_budget(budget_id)
+    |> Repo.delete()
+  end
+
   def list_budgets(%{user_id: user_id}) do
     Queries.where_user(%{user_id: user_id})
     |> Repo.all()
@@ -24,6 +29,10 @@ defmodule Ekmi.Keihi do
 
   def find_budget(user_id, budget_id) do
     Repo.one(Queries.where_user_and_budget_ids%{user_id: user_id, budget_id: budget_id})
+  end
+
+  def find_budget(budget_id) do
+    Repo.get(Budget, budget_id)
   end
 
   def change_budget(%Budget{} = budget, attr \\ %{}) do

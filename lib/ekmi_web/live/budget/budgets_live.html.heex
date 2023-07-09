@@ -10,6 +10,8 @@
     live_action={@live_action}
     balance={@balance}
     user_id={@user_id}
+    selected_budget={@selected_budget}
+    options={@options}
   />
 </.modal>
 
@@ -17,7 +19,7 @@
 <Budgets.Components.monthly_balance balance={@balance} remaining_balance={@remaining_balance} />
 
 <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-  <div class="animated-width bg-green-600 h-2.5 rounded-full dark:bg-green-500" style={"width: #{@remaining_balance / @balance * 100}%"}></div>
+  <div class={"animated-width h-2.5 rounded-full"} style={"width: #{@bal_percentage}%; background-color: #{budget_bar_color(@bal_percentage)}"}></div>
 </div>
 
 <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">

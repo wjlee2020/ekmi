@@ -24,11 +24,18 @@ defmodule EkmiWeb.BudgetsLive do
 
     options = %{sort_by: sort_by, sort_order: sort_order, page: page, per_page: per_page}
 
+    selected_budget = case Keihi.find_budget(user_id, param_to_integer(params["id"], 0)) do
+      nil -> %{}
+      budget -> budget
+    end
+
     budgets = Keihi.list_budgets(%{user_id: user_id}, options)
     total_budget_cost = Keihi.get_total_budget_cost(%{user_id: user_id})
     finance = Accounts.get_finance(%{user_id: socket.assigns.current_user.id})
-    remaining_balance = finance.balance - total_budget_cost
-    socket = assign(socket, budgets: budgets, options: options, budgets_count: Keihi.budgets_count(), balance: finance.balance, remaining_balance: remaining_balance)
+    balance = finance.balance
+    remaining_balance = balance - total_budget_cost
+    bal_percentage = remaining_balance / balance * 100
+    socket = assign(socket, budgets: budgets, selected_budget: selected_budget, options: options, budgets_count: Keihi.budgets_count(), balance: balance, remaining_balance: remaining_balance, bal_percentage: bal_percentage)
 
     {:noreply, socket}
   end
@@ -104,4 +111,12 @@ defmodule EkmiWeb.BudgetsLive do
     String.to_atom(sort_order)
   end
   defp valid_sort_order(_params), do: :desc
+
+  defp budget_bar_color(bal_percentage) do
+    cond do
+      bal_percentage > 50 -> "green"
+      bal_percentage < 20 -> "red"
+      bal_percentage < 50 -> "yellow"
+    end
+  end
 end
