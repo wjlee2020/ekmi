@@ -38,11 +38,15 @@
   </.sort_link>
 </div>
 
-<div id="budgets" phx-update="stream" class="py-4 flex flex-wrap gap-2">
-  <.link :for={{budget_id, budget} <- @streams.budgets} id={budget_id} patch={~p"/budgets/#{budget}?#{@options}"}>
-    <Budgets.Components.tiles budget={budget} />
-  </.link>
-</div>
+<%= if @budgets_count == 0 do %>
+  <p class="flex justify-center py-12">Are you really saving money? 👀</p>
+<% else %>
+  <div id="budgets" phx-update="stream" class="py-4 flex flex-wrap gap-2">
+    <.link :for={{budget_id, budget} <- @streams.budgets} id={budget_id} patch={~p"/budgets/#{budget}?#{@options}"}>
+      <Budgets.Components.tiles budget={budget} />
+    </.link>
+  </div>
+<% end %>
 
 <div class="mb-4 flex items-center justify-center gap-2">
   <.link
