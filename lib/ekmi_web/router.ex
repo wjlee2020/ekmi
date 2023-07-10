@@ -69,6 +69,7 @@ defmodule EkmiWeb.Router do
       live "/budgets", BudgetsLive
       live "/budgets/new", BudgetsLive, :new
       live "/budgets/:id", BudgetsLive, :edit
+      live "/messages", MessagesLive
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
