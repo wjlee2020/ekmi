@@ -1,5 +1,8 @@
 import Chart from "chart.js/auto";
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { categoryColors, getYearMonth } from "../helpers";
+
+Chart.register(ChartDataLabels);
 
 export default {
   mounted() {
@@ -29,6 +32,20 @@ export default {
         borderWidth: 1
       };
     });
+
+    const formatter = (value, ctx) => {
+      const stackedValues = ctx.chart.data.datasets
+        .map((ds) => ds.data[ctx.dataIndex]);
+      const dsIdxLastVisibleNonZeroValue = stackedValues
+        .reduce((prev, curr, i) => !!curr && !ctx.chart.getDatasetMeta(i).hidden ? Math.max(prev, i) : prev, 0);
+      if (!!value && ctx.datasetIndex === dsIdxLastVisibleNonZeroValue) {
+        return stackedValues
+          .filter((ds, i) => !ctx.chart.getDatasetMeta(i).hidden)
+          .reduce((sum, v) => sum + v, 0);
+      } else {
+        return "";
+      }
+    };
     
     this.chart = new Chart(
       this.el,
@@ -39,12 +56,24 @@ export default {
           datasets: datasets
         },
         options: {
+          plugins: {
+            datalabels: {
+              align: 'top',
+              anchor: 'end',
+              formatter,
+            }
+          },
           scales: {
             x: {
               stacked: true
             },
             y: { stacked: true, ticks: { stepSize: 1000 }, min: 0, max: 400000 }
           },
+        },
+        tooltips: {
+          mode: 'label',
+          callbacks: {
+          }
         },
       },
     );
