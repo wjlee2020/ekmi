@@ -24,7 +24,7 @@ import topbar from "../vendor/topbar"
 import BudgetChart from "./chart/budget_chart"
 
 let Hooks = {};
-Hooks.Chart = BudgetChart
+Hooks.BudgetChart = BudgetChart
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {

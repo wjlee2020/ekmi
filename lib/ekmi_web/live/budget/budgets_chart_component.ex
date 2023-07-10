@@ -24,7 +24,7 @@ defmodule EkmiWeb.BudgetsChartComponent do
 
       <canvas
         id="budget-chart"
-        phx-hook="Chart"
+        phx-hook="BudgetChart"
         class="mt-32"
         data-budgets={Jason.encode!(budget_list)}
       >

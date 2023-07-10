@@ -1,6 +1,6 @@
 import Chart from "chart.js/auto";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { categoryColors, getYearMonth } from "../helpers";
+import { categoryColors, formatter, getYearMonth, jpyCurrency } from "../helpers";
 
 Chart.register(ChartDataLabels);
 
@@ -19,7 +19,7 @@ export default {
       acc[yearMonth][curr.category] += curr.cost;
       return acc;
     }, {});
-    
+
     const categories = [...new Set(budgets.map(budget => budget.category))];
     const sortedDates = Object.keys(groupedData).sort((a, b) => new Date(a) - new Date(b));
 
@@ -33,20 +33,6 @@ export default {
       };
     });
 
-    const formatter = (value, ctx) => {
-      const stackedValues = ctx.chart.data.datasets
-        .map((ds) => ds.data[ctx.dataIndex]);
-      const dsIdxLastVisibleNonZeroValue = stackedValues
-        .reduce((prev, curr, i) => !!curr && !ctx.chart.getDatasetMeta(i).hidden ? Math.max(prev, i) : prev, 0);
-      if (!!value && ctx.datasetIndex === dsIdxLastVisibleNonZeroValue) {
-        return stackedValues
-          .filter((ds, i) => !ctx.chart.getDatasetMeta(i).hidden)
-          .reduce((sum, v) => sum + v, 0);
-      } else {
-        return "";
-      }
-    };
-    
     this.chart = new Chart(
       this.el,
       {
@@ -61,19 +47,39 @@ export default {
               align: 'top',
               anchor: 'end',
               formatter,
-            }
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += jpyCurrency(context.parsed.y);
+                  }
+                  return label;
+                },
+                footer: function(items) {
+                  const barTotal = Object.values(groupedData[items[0].label]).reduce((acc, cost) => acc + cost, 0);
+                  return 'Total: ' + jpyCurrency(barTotal)
+                }
+              },
+            },
           },
           scales: {
             x: {
               stacked: true
             },
-            y: { stacked: true, ticks: { stepSize: 1000 }, min: 0, max: 400000 }
+            y: {
+              stacked: true,
+              ticks: { 
+                stepSize: 1000
+              },
+              min: 0,
+              max: 400000,
+            },
           },
-        },
-        tooltips: {
-          mode: 'label',
-          callbacks: {
-          }
         },
       },
     );
