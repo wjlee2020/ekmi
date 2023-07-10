@@ -3,7 +3,7 @@ defmodule EkmiWeb.BudgetsLive do
 
   alias Ekmi.Accounts
   alias Ekmi.Keihi
-  alias EkmiWeb.{Budgets, BudgetsFormComponent}
+  alias EkmiWeb.{Budgets, BudgetsChartComponent, BudgetsFormComponent}
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
