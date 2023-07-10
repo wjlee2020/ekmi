@@ -14,7 +14,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
     <div class="relative">
       <button
         phx-click={toggle_sidebar()}
-        class="fixed top-8 left-8 inline-flex items-center justify-center p-2 w-10 h-10 ml-3 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-hamburger" aria-expanded="false"
+        class="absolute -top-16 sm:-top-16 sm:-left-32 inline-flex items-center justify-center p-2 w-10 h-10 ml-3 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-hamburger" aria-expanded="false"
       >
         <span class="sr-only">Open main menu</span>
         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
@@ -30,7 +30,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
 
       <div
         id="main-sidebar"
-        class={"h-full w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-50 dark:bg-gray-800 #{unless @show_cart, do: "hidden"}"}
+        class={"z-10 h-full w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-50 dark:bg-gray-800 #{unless @show_cart, do: "hidden"}"}
       >
         <button
           phx-click={toggle_sidebar()}
