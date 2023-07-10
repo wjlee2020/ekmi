@@ -21,93 +21,10 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
-import Chart from 'chart.js/auto'
+import BudgetChart from "./chart/budget_chart"
 
 let Hooks = {};
-
-Hooks.Chart = {
-  mounted() {
-    const budgets = JSON.parse(this.el.dataset.budgets);
-
-    const groupedData = budgets.reduce((acc, curr) => {
-      if (!acc[curr.created_at]) {
-        acc[curr.created_at] = {};
-      }
-
-      if (!acc[curr.created_at][curr.category]) {
-        acc[curr.created_at][curr.category] = 0;
-      }
-
-      acc[curr.created_at][curr.category] += curr.cost;
-      return acc;
-    }, {});
-
-    const categoryColors = {
-      'Rent': { 
-        backgroundColor: 'rgba(75, 192, 192, 0.2)', 
-        borderColor: 'rgba(75, 192, 192, 1)' 
-      },
-      'Groceries/Food': { 
-        backgroundColor: 'rgba(255, 99, 132, 0.2)', 
-        borderColor: 'rgba(255, 99, 132, 1)' 
-      },
-      'Transportation': { 
-        backgroundColor: 'rgba(255, 205, 86, 0.2)', 
-        borderColor: 'rgba(255, 205, 86, 1)' 
-      },
-      'Utilities': { 
-        backgroundColor: 'rgba(54, 162, 235, 0.2)', 
-        borderColor: 'rgba(54, 162, 235, 1)' 
-      },
-      'Entertainment': { 
-        backgroundColor: 'rgba(153, 102, 255, 0.2)', 
-        borderColor: 'rgba(153, 102, 255, 1)' 
-      },
-      'Misc./Hobby': { 
-        backgroundColor: 'rgba(201, 203, 207, 0.2)', 
-        borderColor: 'rgba(201, 203, 207, 1)' 
-      },
-    };
-    
-    
-    
-    const categories = [...new Set(budgets.map(budget => budget.category))];
-    const sortedDates = Object.keys(groupedData).sort((a, b) => new Date(a) - new Date(b));
-
-    const datasets = categories.map(category => {
-      return {
-        label: category,
-        data: sortedDates.map(date => groupedData[date][category] || 0),
-        backgroundColor: categoryColors[category].backgroundColor,
-        borderColor: categoryColors[category].borderColor,
-        borderWidth: 1
-      };
-    });
-    
-    this.chart = new Chart(
-      this.el,
-      {
-        type: 'bar',
-        data: {
-          labels: sortedDates,
-          datasets: datasets
-        },
-        options: {
-          scales: {
-            x: {
-              stacked: true
-            },
-            y: { stacked: true, ticks: { stepSize: 1000 }, min: 0, max: 400000 }
-          },
-        },
-      },
-    );
-  },
-
-  destroyed() {
-    this.chart.destroy();
-  }
-};
+Hooks.Chart = BudgetChart
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
