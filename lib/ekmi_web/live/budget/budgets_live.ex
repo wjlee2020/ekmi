@@ -1,7 +1,7 @@
 defmodule EkmiWeb.BudgetsLive do
   use EkmiWeb, :live_view
 
-  alias Ekmi.Accounts
+  alias Ekmi.{Accounts, Repo}
   alias Ekmi.Keihi
   alias EkmiWeb.{Budgets, BudgetsChartComponent, BudgetsFormComponent}
 
@@ -22,7 +22,20 @@ defmodule EkmiWeb.BudgetsLive do
     page = param_to_integer(params["page"], 1)
     per_page = param_to_integer(params["per_page"], 9)
 
-    options = %{sort_by: sort_by, sort_order: sort_order, page: page, per_page: per_page}
+    date = Date.utc_today()
+
+    year = param_to_integer(params["year"], date.year)
+    month = param_to_integer(params["month"], date.month)
+
+
+    options = %{
+      sort_by: sort_by,
+      sort_order: sort_order,
+      page: page,
+      per_page: per_page,
+      year: year,
+      month: month
+    }
 
     selected_budget = case Keihi.find_budget(user_id, param_to_integer(params["id"], 0)) do
       nil -> %{}
@@ -37,7 +50,7 @@ defmodule EkmiWeb.BudgetsLive do
     bal_percentage = remaining_balance / balance * 100
     socket =
       socket
-      |> stream(:budgets, budgets)
+      |> stream(:budgets, budgets, reset: true)
       |> assign(:selected_budget, selected_budget)
       |> assign(:budgets_count, Keihi.budgets_count())
       |> assign(:balance, balance)
@@ -55,8 +68,19 @@ defmodule EkmiWeb.BudgetsLive do
     {:noreply, socket}
   end
 
+  def handle_event("filter", %{"budget_ym" => budget_ym}, socket) do
+    [year, month] = String.split(budget_ym, "-")
+    IO.inspect([year, month])
+    params = %{socket.assigns.options | year: year, month: month}
+
+    socket = push_patch(socket, to: ~p"/budgets?#{params}")
+    {:noreply, socket}
+  end
+
   @impl true
   def handle_info({:budget_created, budget}, socket) do
+    budget = budget |> Repo.preload(:category)
+
     socket =
       socket
       |> stream_insert(:budgets, budget, at: 0)
@@ -82,10 +106,18 @@ defmodule EkmiWeb.BudgetsLive do
   slot :inner_block, required: true
   def sort_link(assigns) do
     ~H"""
-    <.link class="px-4 w-32 text-center" navigate={~p"/budgets?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"}>
+    <.link class="px-4 w-32 text-center" patch={~p"/budgets?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"}>
       <%= render_slot(@inner_block) %>
       <%= sort_indicator(@sort_by, @options) %>
     </.link>
+    """
+  end
+
+  def filter_form(assigns) do
+    ~H"""
+    <form phx-change="filter">
+      <input id="budget_ym" type="month" name="budget_ym" value={"#{@options.year}-#{@options.month}"} />
+    </form>
     """
   end
 

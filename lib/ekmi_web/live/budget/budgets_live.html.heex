@@ -36,6 +36,8 @@
   <.sort_link sort_by={:created_at} options={@options}>
     Created
   </.sort_link>
+
+  <.filter_form options={@options} />
 </div>
 
 <%= if @budgets_count == 0 do %>
@@ -82,10 +84,6 @@
   </.link>
 
   <div class="flex items-center gap-4 ml-auto">
-    <span>
-      Total: <%= @budgets_count %>
-    </span>
-
     <form phx-change="select-per-page">
       <label for="per-page">Per-Page</label>
 

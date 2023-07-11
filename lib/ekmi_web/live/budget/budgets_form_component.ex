@@ -1,7 +1,7 @@
 defmodule EkmiWeb.BudgetsFormComponent do
   use EkmiWeb, :live_component
 
-  alias Ekmi.{Keihi, Repo}
+  alias Ekmi.Keihi
   alias Ekmi.Keihi.Budget
 
   @impl Phoenix.LiveComponent
@@ -73,7 +73,6 @@ defmodule EkmiWeb.BudgetsFormComponent do
   def handle_event("save", %{"budget" => budget}, socket) do
     case Keihi.create_budget(budget) do
       {:ok, budget} ->
-        Repo.preload(budget, :category)
         send(self(), {:budget_created, budget})
 
         {:noreply, socket}
@@ -121,11 +120,6 @@ defmodule EkmiWeb.BudgetsFormComponent do
   def handle_event("delete", %{"id" => budget_id}, socket) do
     {:ok, budget} = Keihi.delete_budget(budget_id)
     send(self(), {:budget_deleted, budget})
-
-    # socket =
-    #   socket
-    #   |> put_flash(:info, "Deleted budget")
-    #   |> push_patch(to: ~p"/budgets")
     {:noreply, socket}
   end
 

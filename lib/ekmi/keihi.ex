@@ -32,6 +32,7 @@ defmodule Ekmi.Keihi do
     |> Queries.paginate(options)
     |> Queries.records_for_month(options)
     |> Repo.all()
+    |> Repo.preload(:category)
   end
 
   def find_budget(user_id, budget_id) do
