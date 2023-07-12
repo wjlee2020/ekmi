@@ -27,7 +27,6 @@ defmodule EkmiWeb.BudgetsLive do
     year = param_to_integer(params["year"], date.year)
     month = param_to_integer(params["month"], date.month)
 
-
     options = %{
       sort_by: sort_by,
       sort_order: sort_order,
@@ -70,7 +69,6 @@ defmodule EkmiWeb.BudgetsLive do
 
   def handle_event("filter", %{"budget_ym" => budget_ym}, socket) do
     [year, month] = String.split(budget_ym, "-")
-    IO.inspect([year, month])
     params = %{socket.assigns.options | year: year, month: month}
 
     socket = push_patch(socket, to: ~p"/budgets?#{params}")
@@ -114,9 +112,11 @@ defmodule EkmiWeb.BudgetsLive do
   end
 
   def filter_form(assigns) do
+    date = format_date(%{year: assigns.options.year, month: assigns.options.month})
+    assigns = assign(assigns, :date, date)
     ~H"""
     <form phx-change="filter">
-      <input id="budget_ym" type="month" name="budget_ym" value={"#{@options.year}-#{@options.month}"} />
+      <input class="border-0 rounded-lg" id="budget_ym" type="month" name="budget_ym" value={@date} />
     </form>
     """
   end
@@ -180,5 +180,19 @@ defmodule EkmiWeb.BudgetsLive do
       bal_percentage < 20 -> "red"
       bal_percentage < 50 -> "yellow"
     end
+  end
+
+  defp format_date(map) do
+    year = Map.get(map, :year) |> Integer.to_string()
+    month = Map.get(map, :month)
+
+    month_string =
+      if month < 10 do
+        "0" <> Integer.to_string(month)
+      else
+        Integer.to_string(month)
+      end
+
+    "#{year}-#{month_string}"
   end
 end

@@ -17,6 +17,7 @@ defmodule EkmiWeb.BudgetsChartComponent do
         description: budget.description,
       }
     end)
+    assigns = assign(assigns, :budget_list, budget_list)
 
     ~H"""
     <div class="mt-36">
@@ -26,7 +27,7 @@ defmodule EkmiWeb.BudgetsChartComponent do
         id="budget-chart"
         phx-hook="BudgetChart"
         class="mt-32"
-        data-budgets={Jason.encode!(budget_list)}
+        data-budgets={Jason.encode!(@budget_list)}
       >
       </canvas>
     </div>
