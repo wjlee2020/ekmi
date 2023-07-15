@@ -1,4 +1,9 @@
 defmodule EkmiWeb.BudgetsLive do
+  @moduledoc """
+  Budgets Live Module for handling all things budget related.
+  """
+  @moduledoc since: "1.0.0"
+
   use EkmiWeb, :live_view
 
   @s3_bucket "ekmi-uploads"
@@ -87,7 +92,7 @@ defmodule EkmiWeb.BudgetsLive do
     [year, month] = String.split(budget_ym, "-")
     params = %{socket.assigns.options | year: year, month: month}
 
-    socket = push_patch(socket, to: ~p"/budgets?#{params}")
+    socket = push_navigate(socket, to: ~p"/budgets?#{params}")
     {:noreply, socket}
   end
 
@@ -131,7 +136,7 @@ defmodule EkmiWeb.BudgetsLive do
   slot :inner_block, required: true
   def sort_link(assigns) do
     ~H"""
-    <.link class="px-4 w-32 text-center" patch={~p"/budgets?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"}>
+    <.link class="px-4 w-32 text-center" navigate={~p"/budgets?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"}>
       <%= render_slot(@inner_block) %>
       <%= sort_indicator(@sort_by, @options) %>
     </.link>
