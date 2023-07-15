@@ -4,10 +4,27 @@ defmodule Ekmi.Keihi do
   alias Ekmi.Keihi.{Budget, Queries}
   alias Ekmi.Repo
 
+  def subscribe do
+    Phoenix.PubSub.subscribe(Ekmi.PubSub, "budgets")
+  end
+
+  def broadcast({:ok, budget}, tag) do
+    Phoenix.PubSub.broadcast(
+      Ekmi.PubSub,
+      "budgets",
+      {tag, budget}
+    )
+
+    {:ok, budget}
+  end
+
+  def broadcast({:error, _reason} = error, _tag), do: error
+
   def create_budget(attrs \\ %{}) do
     %Budget{}
     |> change_budget(attrs)
     |> Repo.insert()
+    |> broadcast(:budget_created)
   end
 
   def delete_budget(budget_id) do
@@ -19,6 +36,7 @@ defmodule Ekmi.Keihi do
     selected_budget
     |> change_budget(attrs)
     |> Repo.update()
+    |> broadcast(:budget_updated)
   end
 
   def list_budgets(%{user_id: user_id}, options) when is_map(options) do

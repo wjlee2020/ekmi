@@ -1,7 +1,16 @@
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { chartConfig } from "../helpers";
 
 Chart.register(ChartDataLabels);
+const backgroundColor = [
+  "#4287F5",
+  "#F7630C",
+  "#28B463",
+  "#FFCE56",
+  "#9966FF",
+  "#FF6666",
+];
 
 export default {
   mounted() {
@@ -16,43 +25,7 @@ export default {
     const categoryNames = Object.keys(categories);
     const categoryCosts = Object.values(categories);
 
-    this.chart = new Chart(this.el, {
-      type: "pie",
-      data: {
-        labels: categoryNames,
-        datasets: [
-          {
-            label: "Expenses",
-            data: categoryCosts,
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.2)",
-              "rgba(54, 162, 235, 0.2)",
-              "rgba(255, 206, 86, 0.2)",
-            ],
-            borderColor: [
-              "rgba(255, 99, 132, 1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        legend: {
-          position: "top",
-        },
-        title: {
-          display: true,
-          text: "Expenses by Category",
-        },
-        animation: {
-          animateScale: true,
-          animateRotate: true,
-        },
-      },
-    });
+    this.chart = new Chart(this.el, chartConfig(categoryNames, categoryCosts));
   },
 
   updated() {
@@ -69,43 +42,7 @@ export default {
     const categoryNames = Object.keys(categories);
     const categoryCosts = Object.values(categories);
 
-    this.chart = new Chart(this.el, {
-      type: "pie",
-      data: {
-        labels: categoryNames,
-        datasets: [
-          {
-            label: "Expenses",
-            data: categoryCosts,
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.2)",
-              "rgba(54, 162, 235, 0.2)",
-              "rgba(255, 206, 86, 0.2)",
-            ],
-            borderColor: [
-              "rgba(255, 99, 132, 1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        legend: {
-          position: "top",
-        },
-        title: {
-          display: true,
-          text: "Expenses by Category",
-        },
-        animation: {
-          animateScale: true,
-          animateRotate: true,
-        },
-      },
-    });
+    this.chart = new Chart(this.el, chartConfig(categoryNames, categoryCosts));
   },
 
   destroyed() {

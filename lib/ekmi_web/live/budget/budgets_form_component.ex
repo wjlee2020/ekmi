@@ -72,9 +72,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
   @impl true
   def handle_event("save", %{"budget" => budget}, socket) do
     case Keihi.create_budget(budget) do
-      {:ok, budget} ->
-        send(self(), {:budget_created, budget})
-
+      {:ok, _budget} ->
         {:noreply, socket}
 
       {:error, changeset} ->
@@ -95,11 +93,6 @@ defmodule EkmiWeb.BudgetsFormComponent do
   def handle_event("update", %{"budget" => budget}, socket) do
     case Keihi.update_budget(socket.assigns.selected_budget, budget) do
       {:ok, _budget} ->
-        socket =
-          socket
-          |> put_flash(:info, "Updated budget!")
-          |> push_patch(to: ~p"/budgets")
-
         {:noreply, socket}
 
       {:error, changeset} ->

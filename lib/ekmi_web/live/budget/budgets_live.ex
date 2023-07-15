@@ -7,6 +7,8 @@ defmodule EkmiWeb.BudgetsLive do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
+    if connected?(socket), do: Keihi.subscribe()
+
     [username, _domain] = String.split(socket.assigns.current_user.email, "@")
     socket = assign(socket, username: String.capitalize(username), user_id: socket.assigns.current_user.id )
 
@@ -49,7 +51,7 @@ defmodule EkmiWeb.BudgetsLive do
     bal_percentage = remaining_balance / balance * 100
     socket =
       socket
-      |> stream(:budgets, budgets, reset: true)
+      |> stream(:budgets, budgets)
       |> assign(:selected_budget, selected_budget)
       |> assign(:budgets_count, Keihi.budgets_count())
       |> assign(:balance, balance)
@@ -78,11 +80,22 @@ defmodule EkmiWeb.BudgetsLive do
   @impl true
   def handle_info({:budget_created, budget}, socket) do
     budget = budget |> Repo.preload(:category)
-
     socket =
       socket
       |> stream_insert(:budgets, budget, at: 0)
       |> put_flash(:info, "Created budget!")
+      |> push_navigate(to: ~p"/budgets")
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:budget_updated, budget}, socket) do
+    budget = budget |> Repo.preload(:category)
+    socket =
+      socket
+      |> stream_insert(:budgets, budget)
+      |> put_flash(:info, "Budget updated")
       |> push_navigate(to: ~p"/budgets")
 
     {:noreply, socket}
@@ -94,7 +107,7 @@ defmodule EkmiWeb.BudgetsLive do
       socket
       |> stream_delete(:budgets, budget)
       |> put_flash(:info, "Deleted budget!")
-      |> push_navigate(to: ~p"/budgets")
+      |> push_patch(to: ~p"/budgets")
 
     {:noreply, socket}
   end
