@@ -117,6 +117,20 @@ defmodule EkmiWeb.BudgetsFormComponent do
           <.input label="Date" field={@budget_form[:created_at]} value={@selected_budget.created_at} type="date" autocomplete="off" />
           <.input label="Description" field={@budget_form[:description]} value={@selected_budget.description} type="textarea" placeholder="Budget Description" autocomplete="off" />
 
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div
+              :for={
+                {img, _index} <-
+                  Enum.with_index(@selected_budget.receipt_img)
+              }
+            >
+              <img
+                class="h-auto max-w-full rounded-lg object-cover"
+                src={img}
+              />
+            </div>
+          </div>
+
           <.button class="mt-2" phx-disable-with="Loading...">Update</.button>
 
           <.button
@@ -137,10 +151,9 @@ defmodule EkmiWeb.BudgetsFormComponent do
 
   @impl true
   def handle_event("save", %{"budget" => budget}, socket) do
-
     receipt_img =
       consume_uploaded_entries(socket, :receipt_img, fn meta, entry ->
-        destination =
+        dest =
           Path.join([
             "priv",
             "static",
@@ -148,9 +161,9 @@ defmodule EkmiWeb.BudgetsFormComponent do
             "#{entry.uuid}-#{entry.client_name}"
           ])
 
-        File.cp!(meta.path, destination)
+        File.cp!(meta.path, dest)
 
-        url_path = static_path(socket, "/uploads/#{Path.basename(destination)}")
+        url_path = static_path(socket, "/uploads/#{Path.basename(dest)}")
 
         {:ok, url_path}
       end)

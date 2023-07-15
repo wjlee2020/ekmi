@@ -56,7 +56,7 @@ config :ekmi, EkmiWeb.Endpoint,
 config :ekmi, EkmiWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/(?!uploads).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/ekmi_web/(controllers|live|components)/.*(ex|heex)$"
     ]
