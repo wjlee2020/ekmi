@@ -12,10 +12,12 @@
     user_id={@user_id}
     selected_budget={@selected_budget}
     options={@options}
+    uploads={@uploads}
   />
 </.modal>
 
 <h1 class="text-3xl font-bold">Hello <%= @username %>!</h1>
+
 <Budgets.Components.monthly_balance balance={@balance} remaining_balance={@remaining_balance} />
 
 <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
@@ -52,9 +54,6 @@
     >
       <Budgets.Components.tiles budget={budget} />
     </.link>
-
-    <%!-- TODO: set something up for small screens since there is a lot of space --%>
-    <%!-- <p class="flex sm:hidden">hello</p> --%>
   </div>
 <% end %>
 

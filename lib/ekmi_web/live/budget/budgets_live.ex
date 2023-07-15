@@ -11,6 +11,15 @@ defmodule EkmiWeb.BudgetsLive do
 
     [username, _domain] = String.split(socket.assigns.current_user.email, "@")
     socket = assign(socket, username: String.capitalize(username), user_id: socket.assigns.current_user.id )
+    socket =
+      socket
+      |> assign(username: String.capitalize(username), user_id: socket.assigns.current_user.id)
+      |> allow_upload(
+        :receipt_img,
+        accept: ~w(.png .jpeg .jpg),
+        max_entries: 3,
+        max_file_size: 10_000_000
+      )
 
     {:ok, socket}
   end

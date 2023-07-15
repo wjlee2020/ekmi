@@ -1,17 +1,20 @@
 defmodule Ekmi.Keihi do
   @moduledoc false
 
+  @topic inspect(__MODULE__)
+  @pubsub Ekmi.PubSub
+
   alias Ekmi.Keihi.{Budget, Queries}
   alias Ekmi.Repo
 
   def subscribe do
-    Phoenix.PubSub.subscribe(Ekmi.PubSub, "budgets")
+    Phoenix.PubSub.subscribe(@pubsub, @topic)
   end
 
   def broadcast({:ok, budget}, tag) do
     Phoenix.PubSub.broadcast(
-      Ekmi.PubSub,
-      "budgets",
+      @pubsub,
+      @topic,
       {tag, budget}
     )
 
@@ -30,6 +33,7 @@ defmodule Ekmi.Keihi do
   def delete_budget(budget_id) do
     find_budget(budget_id)
     |> Repo.delete()
+    |> broadcast(:budget_deleted)
   end
 
   def update_budget(selected_budget, attrs \\ %{}) do
