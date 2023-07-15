@@ -1,6 +1,10 @@
 defmodule EkmiWeb.BudgetsLive do
   use EkmiWeb, :live_view
 
+  @s3_bucket "ekmi-uploads"
+  @s3_url "//#{@s3_bucket}.s3.amazonaws.com"
+  @s3_region "ap-northeast-1"
+
   alias Ekmi.{Accounts, Repo}
   alias Ekmi.Keihi
   alias EkmiWeb.{Budgets, BudgetsChartComponent, BudgetsFormComponent}
@@ -18,7 +22,8 @@ defmodule EkmiWeb.BudgetsLive do
         :receipt_img,
         accept: ~w(.png .jpeg .jpg),
         max_entries: 3,
-        max_file_size: 10_000_000
+        max_file_size: 10_000_000,
+        external: &presign_upload/2
       )
 
     {:ok, socket}
@@ -216,5 +221,30 @@ defmodule EkmiWeb.BudgetsLive do
       end
 
     "#{year}-#{month_string}"
+  end
+
+  defp presign_upload(entry, socket) do
+    config = %{
+      region: @s3_region,
+      access_key_id: System.fetch_env!("AWS_ACCESS_KEY_ID"),
+      secret_access_key: System.fetch_env!("AWS_SECRET_ACCESS_KEY")
+    }
+
+    {:ok, fields} =
+      SimpleS3Upload.sign_form_upload(config, "my-bucket",
+        key: "public/my-file-name",
+        content_type: "image/png",
+        max_file_size: 10_000,
+        expires_in: :timer.hours(1)
+      )
+
+    metadata = %{
+      uploader: "S3",
+      key: "#{entry.uuid}-#{entry.client_name}",
+      url: @s3_url,
+      fields: fields
+    }
+
+    {:ok, metadata, socket}
   end
 end
