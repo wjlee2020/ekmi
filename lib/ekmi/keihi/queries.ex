@@ -28,7 +28,7 @@ defmodule Ekmi.Keihi.Queries do
   def records_for_month(query, %{year: year}) when is_nil(year), do: query
 
   def records_for_month(query, %{year: year, month: month}) do
-    from(b in Budget,
+    from(b in query,
       where: fragment("extract(year from ?) = ? and extract(month from ?) = ?", b.created_at, ^year, b.created_at, ^month)
     )
   end

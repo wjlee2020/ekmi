@@ -1,6 +1,5 @@
 import Chart from "chart.js/auto";
-import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { categoryColors, formatter, getYearMonth, jpyCurrency } from "../helpers";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 Chart.register(ChartDataLabels);
 
@@ -8,81 +7,52 @@ export default {
   mounted() {
     const budgets = JSON.parse(this.el.dataset.budgets);
 
-    const groupedData = budgets.reduce((acc, curr) => {
-      const yearMonth = getYearMonth(curr.created_at);
-      if (!acc[yearMonth]) {
-        acc[yearMonth] = {};
-      }
-      if (!acc[yearMonth][curr.category]) {
-        acc[yearMonth][curr.category] = 0;
-      }
-      acc[yearMonth][curr.category] += curr.cost;
-      return acc;
+    const categories = budgets.reduce((accumulator, item) => {
+      accumulator[item.category] =
+        (accumulator[item.category] || 0) + item.cost;
+      return accumulator;
     }, {});
 
-    const categories = [...new Set(budgets.map(budget => budget.category))];
-    const sortedDates = Object.keys(groupedData).sort((a, b) => new Date(a) - new Date(b));
+    const categoryNames = Object.keys(categories);
+    const categoryCosts = Object.values(categories);
 
-    const datasets = categories.map(category => {
-      return {
-        label: category,
-        data: sortedDates.map(date => groupedData[date][category] || 0),
-        backgroundColor: categoryColors[category].backgroundColor,
-        borderColor: categoryColors[category].borderColor,
-        borderWidth: 1
-      };
-    });
-
-    this.chart = new Chart(
-      this.el,
-      {
-        type: 'bar',
-        data: {
-          labels: sortedDates,
-          datasets: datasets
+    this.chart = new Chart(this.el, {
+      type: "pie",
+      data: {
+        labels: categoryNames,
+        datasets: [
+          {
+            label: "Expenses",
+            data: categoryCosts,
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(54, 162, 235, 0.2)",
+              "rgba(255, 206, 86, 0.2)",
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+              "rgba(255, 206, 86, 1)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        legend: {
+          position: "top",
         },
-        options: {
-          plugins: {
-            datalabels: {
-              align: 'top',
-              anchor: 'end',
-              formatter,
-            },
-            tooltip: {
-              callbacks: {
-                label: (context) => {
-                  let label = context.dataset.label || '';
-                  if (label) {
-                    label += ': ';
-                  }
-                  if (context.parsed.y !== null) {
-                    label += jpyCurrency(context.parsed.y);
-                  }
-                  return label;
-                },
-                footer: function(items) {
-                  const barTotal = Object.values(groupedData[items[0].label]).reduce((acc, cost) => acc + cost, 0);
-                  return 'Total: ' + jpyCurrency(barTotal)
-                }
-              },
-            },
-          },
-          scales: {
-            x: {
-              stacked: true
-            },
-            y: {
-              stacked: true,
-              ticks: { 
-                stepSize: 1000
-              },
-              min: 0,
-              max: 400000,
-            },
-          },
+        title: {
+          display: true,
+          text: "Expenses by Category",
+        },
+        animation: {
+          animateScale: true,
+          animateRotate: true,
         },
       },
-    );
+    });
   },
 
   updated() {
@@ -90,84 +60,55 @@ export default {
 
     const budgets = JSON.parse(this.el.dataset.budgets);
 
-    const groupedData = budgets.reduce((acc, curr) => {
-      const yearMonth = getYearMonth(curr.created_at);
-      if (!acc[yearMonth]) {
-        acc[yearMonth] = {};
-      }
-      if (!acc[yearMonth][curr.category]) {
-        acc[yearMonth][curr.category] = 0;
-      }
-      acc[yearMonth][curr.category] += curr.cost;
-      return acc;
+    const categories = budgets.reduce((accumulator, item) => {
+      accumulator[item.category] =
+        (accumulator[item.category] || 0) + item.cost;
+      return accumulator;
     }, {});
 
-    const categories = [...new Set(budgets.map(budget => budget.category))];
-    const sortedDates = Object.keys(groupedData).sort((a, b) => new Date(a) - new Date(b));
+    const categoryNames = Object.keys(categories);
+    const categoryCosts = Object.values(categories);
 
-    const datasets = categories.map(category => {
-      return {
-        label: category,
-        data: sortedDates.map(date => groupedData[date][category] || 0),
-        backgroundColor: categoryColors[category].backgroundColor,
-        borderColor: categoryColors[category].borderColor,
-        borderWidth: 1
-      };
-    });
-
-    this.chart = new Chart(
-      this.el,
-      {
-        type: 'bar',
-        data: {
-          labels: sortedDates,
-          datasets: datasets
+    this.chart = new Chart(this.el, {
+      type: "pie",
+      data: {
+        labels: categoryNames,
+        datasets: [
+          {
+            label: "Expenses",
+            data: categoryCosts,
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(54, 162, 235, 0.2)",
+              "rgba(255, 206, 86, 0.2)",
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+              "rgba(255, 206, 86, 1)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        legend: {
+          position: "top",
         },
-        options: {
-          plugins: {
-            datalabels: {
-              align: 'top',
-              anchor: 'end',
-              formatter,
-            },
-            tooltip: {
-              callbacks: {
-                label: (context) => {
-                  let label = context.dataset.label || '';
-                  if (label) {
-                    label += ': ';
-                  }
-                  if (context.parsed.y !== null) {
-                    label += jpyCurrency(context.parsed.y);
-                  }
-                  return label;
-                },
-                footer: function(items) {
-                  const barTotal = Object.values(groupedData[items[0].label]).reduce((acc, cost) => acc + cost, 0);
-                  return 'Total: ' + jpyCurrency(barTotal)
-                }
-              },
-            },
-          },
-          scales: {
-            x: {
-              stacked: true
-            },
-            y: {
-              stacked: true,
-              ticks: { 
-                stepSize: 1000
-              },
-              min: 0,
-              max: 400000,
-            },
-          },
+        title: {
+          display: true,
+          text: "Expenses by Category",
+        },
+        animation: {
+          animateScale: true,
+          animateRotate: true,
         },
       },
-    );
+    });
   },
 
   destroyed() {
     this.chart.destroy();
-  }
+  },
 };

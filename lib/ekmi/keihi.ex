@@ -21,11 +21,6 @@ defmodule Ekmi.Keihi do
     |> Repo.update()
   end
 
-  def list_budgets(%{user_id: user_id}) do
-    Queries.where_user(%{user_id: user_id})
-    |> Repo.all()
-  end
-
   def list_budgets(%{user_id: user_id}, options) when is_map(options) do
     Queries.where_user(%{user_id: user_id})
     |> Queries.sort(options)
@@ -33,6 +28,11 @@ defmodule Ekmi.Keihi do
     |> Queries.records_for_month(options)
     |> Repo.all()
     |> Repo.preload(:category)
+  end
+
+  def list_budgets(%{user_id: user_id}) do
+    Queries.where_user(%{user_id: user_id})
+    |> Repo.all()
   end
 
   def find_budget(user_id, budget_id) do
