@@ -1,4 +1,4 @@
-defmodule Ekmi.Chats.Message do
+defmodule Ekmi.Chat.Message do
   use Ecto.Schema
   import Ecto.Changeset
 

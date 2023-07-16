@@ -1,15 +1,100 @@
 defmodule EkmiWeb.MessagesLive do
   use EkmiWeb, :live_view
 
+  alias Ekmi.Chat
+  alias Ekmi.Chat.Message
+
   @impl Phoenix.LiveView
-  def mount(params, session, socket) do
+  def mount(_params, _session, socket) do
+    sender_id = socket.assigns.current_user.id
+    changset = Chat.change_message(%Message{})
+    messages = Chat.list_messages()
+
+    socket =
+      socket
+      |> stream(:messages, messages)
+      |> assign(:message_form, to_form(changset))
+      |> assign(:sender_id, sender_id)
+      |> assign(:receiver_id, 1)
+
     {:ok, socket}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-    <.form>
+    <div class="h-[35rem] grid p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+      <div id="messages" phx-update="stream" class="flex flex-col gap-4">
+        <div
+          :for={{message_id, message} <- @streams.messages}
+          id={message_id}
+          style={"align-self: #{message_align(%{sender_email: message.sender.email, current_user_email: assigns.current_user.email})}"}
+        >
+          <div class="flex flex-col p-4 bg-white border border-white rounded-lg">
+            <span>
+              <%= message.sender.email %> wrote:
+            </span>
+
+            <span>
+              <%= message.content %>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <.message_input
+        message_form={@message_form}
+        sender_id={@sender_id}
+        receiver_id={@receiver_id}
+      />
+    </div>
+    """
+  end
+
+  @impl true
+  def handle_event("validate", %{"message" => message}, socket) do
+    message_form =
+      %Message{}
+      |> Chat.change_message(message)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, message_form: message_form)}
+  end
+
+  def handle_event("send", %{"message" => message}, socket) do
+    case Chat.create_message(message) do
+      {:ok, message} ->
+        socket =
+          socket
+          |> stream_insert(:messages, message, at: -1)
+          |> put_flash(:info, "Message sent")
+
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        message_form =
+          changeset
+          |> Map.put(:action, :validate)
+          |> to_form()
+
+        socket =
+          socket
+          |> put_flash(:error, "Failed to send message")
+          |> assign(message_form: message_form)
+
+        {:noreply, socket}
+    end
+  end
+
+  def message_input(assigns) do
+    ~H"""
+    <.form
+      for={@message_form}
+      phx-change="validate"
+      phx-submit="send"
+      style="margin-top: auto;"
+    >
       <label for="chat" class="sr-only">Your message</label>
       <div class="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
         <button
@@ -45,13 +130,18 @@ defmodule EkmiWeb.MessagesLive do
           <span class="sr-only">Upload image</span>
         </button>
 
-        <textarea
+        <.input
+          field={@message_form[:content]}
+          type="textarea"
           id="chat"
           rows="1"
-          class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder="Your message..."
-        >
-        </textarea>
+          placeholder="Send a message"
+          autocomplete="off"
+          style="min-height: auto; width: 95%; margin: 12px auto;"
+        />
+
+        <.input type="hidden" field={@message_form[:sender_id]} value={@sender_id} />
+        <.input type="hidden" field={@message_form[:receiver_id]} value={@receiver_id} />
 
         <button
           type="submit"
@@ -71,5 +161,12 @@ defmodule EkmiWeb.MessagesLive do
       </div>
     </.form>
     """
+  end
+
+  defp message_align(%{sender_email: sender_email, current_user_email: current_user_email}) do
+    cond do
+      sender_email == current_user_email -> "end"
+      true -> "start"
+    end
   end
 end

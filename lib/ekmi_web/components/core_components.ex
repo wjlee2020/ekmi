@@ -340,7 +340,7 @@ defmodule EkmiWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <div phx-feedback-for={@name}>
+    <div phx-feedback-for={@name} class="w-full">
       <.label for={@id}><%= @label %></.label>
       <textarea
         id={@id}
