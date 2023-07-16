@@ -167,9 +167,19 @@ defmodule EkmiWeb.BudgetsFormComponent do
           />
 
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-            <div :for={{img_location, _index} <- Enum.with_index(@selected_budget.receipt_img)}>
+            <div :for={{img_location, index} <- Enum.with_index(@selected_budget.receipt_img)} class="relative">
               <img class="h-64 max-w-full rounded-lg object-cover" src={img_location} />
+
+              <a
+                class="absolute -top-4 -right-2 text-2xl font-bold cursor-pointer hover:text-red-400"
+                phx-click="remove_img"
+                phx-value-ref={index}
+                phx-target={@myself}
+                >
+                  &times;
+                </a>
             </div>
+
           </div>
 
           <.button class="mt-2" phx-disable-with="Loading...">Update</.button>
@@ -269,6 +279,14 @@ defmodule EkmiWeb.BudgetsFormComponent do
 
         {:noreply, socket}
     end
+  end
+
+  def handle_event("remove_img", %{"ref" => ref}, socket) do
+    index = String.to_integer(ref)
+    current_images = socket.assigns.selected_budget.receipt_img
+    updated_images = List.delete_at(current_images, index)
+    updated_budget = %{socket.assigns.selected_budget | receipt_img: updated_images}
+    {:noreply, assign(socket, selected_budget: updated_budget)}
   end
 
   def handle_event("cancel", %{"ref" => ref}, socket) do
