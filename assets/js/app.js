@@ -22,9 +22,11 @@ import {Socket} from "phoenix";
 import {LiveSocket} from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 import BudgetChart from "./chart/budget_chart";
+import ScrollDown from "./scroll";
 
 let Hooks = {};
 Hooks.BudgetChart = BudgetChart;
+Hooks.ScrollDown = ScrollDown;
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {

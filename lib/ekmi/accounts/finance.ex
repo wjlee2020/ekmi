@@ -3,7 +3,7 @@ defmodule Ekmi.Accounts.Finance do
   import Ecto.Changeset
 
   schema "finances" do
-    field :balance, :integer
+    field :balance, :integer, default: 200000
     field :currency, :string
     belongs_to :user, Ekmi.Accounts.User
 

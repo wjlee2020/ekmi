@@ -3,9 +3,12 @@ defmodule EkmiWeb.MessagesLive do
 
   alias Ekmi.Chat
   alias Ekmi.Chat.Message
+  alias Ekmi.Repo
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
+    if connected?(socket), do: Chat.subscribe()
+
     sender_id = socket.assigns.current_user.id
     changset = Chat.change_message(%Message{})
     messages = Chat.list_messages()
@@ -24,17 +27,23 @@ defmodule EkmiWeb.MessagesLive do
   def render(assigns) do
     ~H"""
     <div class="h-[35rem] grid p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-      <div id="messages" phx-update="stream" class="flex flex-col gap-4">
+      <div
+        id="messages"
+        phx-update="stream"
+        phx-hook="ScrollDown"
+        class="flex flex-col gap-4 overflow-scroll"
+        data-scrolled-to-top={"false"}
+      >
         <div
           :for={{message_id, message} <- @streams.messages}
           id={message_id}
+          class="mb-4"
           style={"align-self: #{message_align(%{sender_email: message.sender.email, current_user_email: assigns.current_user.email})}"}
         >
-          <div class="flex flex-col p-4 bg-white border border-white rounded-lg">
-            <span>
-              <%= message.sender.email %> wrote:
-            </span>
-
+          <div
+            class="flex flex-col p-4 rounded-lg"
+            style={"background-color: #{message_style(%{sender_email: message.sender.email, current_user_email: assigns.current_user.email})}"}
+          >
             <span>
               <%= message.content %>
             </span>
@@ -64,12 +73,7 @@ defmodule EkmiWeb.MessagesLive do
 
   def handle_event("send", %{"message" => message}, socket) do
     case Chat.create_message(message) do
-      {:ok, message} ->
-        socket =
-          socket
-          |> stream_insert(:messages, message, at: -1)
-          |> put_flash(:info, "Message sent")
-
+      {:ok, _message} ->
         {:noreply, socket}
 
       {:error, changeset} ->
@@ -85,6 +89,16 @@ defmodule EkmiWeb.MessagesLive do
 
         {:noreply, socket}
     end
+  end
+
+  @impl true
+  def handle_info({:message_sent, message}, socket) do
+    message = Repo.preload(message, [:sender, :receiver])
+    socket =
+      socket
+      |> stream_insert(:messages, message, at: -1)
+
+    {:noreply, socket}
   end
 
   def message_input(assigns) do
@@ -167,6 +181,13 @@ defmodule EkmiWeb.MessagesLive do
     cond do
       sender_email == current_user_email -> "end"
       true -> "start"
+    end
+  end
+
+  defp message_style(%{sender_email: sender_email, current_user_email: current_user_email}) do
+    cond do
+      sender_email == current_user_email -> "white"
+      true -> "#8DA2FB"
     end
   end
 end
