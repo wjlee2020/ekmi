@@ -9,6 +9,7 @@ defmodule Ekmi.Accounts.User do
     field :confirmed_at, :naive_datetime
 
     has_one :finance, Ekmi.Accounts.Finance
+    has_many :budgets, Ekmi.Keihi.Budget
 
     timestamps()
   end
