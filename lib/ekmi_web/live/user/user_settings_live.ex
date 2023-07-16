@@ -19,7 +19,13 @@ defmodule EkmiWeb.UserSettingsLive do
           phx-change="validate_balance"
         >
           <.input field={@finance_form[:balance]} type="number" label="Your Balance" required />
-          <.input field={@finance_form[:currency]} type="select" label="Currency" required options={["USD", "JPY"]} />
+          <.input
+            field={@finance_form[:currency]}
+            type="select"
+            label="Currency"
+            required
+            options={["USD", "JPY"]}
+          />
           <.input field={@finance_form[:user_id]} type="hidden" />
 
           <:actions>
@@ -139,6 +145,7 @@ defmodule EkmiWeb.UserSettingsLive do
 
   def handle_event("validate_balance", params, socket) do
     %{"finance" => finance_params} = params
+
     finance_form =
       %Accounts.Finance{}
       |> Accounts.change_finance(finance_params)
@@ -154,6 +161,7 @@ defmodule EkmiWeb.UserSettingsLive do
     case Accounts.update_finance(finance_params["user_id"], finance_params) do
       {:ok, finance} ->
         finance_changeset = Accounts.change_finance(finance)
+
         socket =
           socket
           |> put_flash(:info, "Updated your balance!")

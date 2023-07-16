@@ -21,10 +21,14 @@
 <Budgets.Components.monthly_balance balance={@balance} remaining_balance={@remaining_balance} />
 
 <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-  <div class={"animated-width h-2.5 rounded-full"} style={"width: #{@bal_percentage}%; background-color: #{budget_bar_color(@bal_percentage)}"}></div>
+  <div
+    class="animated-width h-2.5 rounded-full"
+    style={"width: #{@bal_percentage}%; background-color: #{budget_bar_color(@bal_percentage)}"}
+  >
+  </div>
 </div>
 
-<hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
+<hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 
 <div class="flex flex-col sm:flex-row items-center gap-4">
   <.sort_link sort_by={:category_id} options={@options}>
@@ -86,7 +90,10 @@
     <form phx-change="select-per-page">
       <label for="per-page">Per-Page</label>
 
-      <select class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm text-center inline-flex items-center dark:bg-gray-800 dark:hover:bg-gray-700" name="per-page">
+      <select
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm text-center inline-flex items-center dark:bg-gray-800 dark:hover:bg-gray-700"
+        name="per-page"
+      >
         <%= Phoenix.HTML.Form.options_for_select(
           [9, 18, 27, 36],
           @options.per_page

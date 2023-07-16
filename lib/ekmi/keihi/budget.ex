@@ -18,7 +18,15 @@ defmodule Ekmi.Keihi.Budget do
   @doc false
   def changeset(budget, attrs) do
     budget
-    |> cast(attrs, [:title, :description, :cost, :category_id, :user_id, :created_at, :receipt_img])
+    |> cast(attrs, [
+      :title,
+      :description,
+      :cost,
+      :category_id,
+      :user_id,
+      :created_at,
+      :receipt_img
+    ])
     |> validate_required([:title, :description, :cost, :category_id, :user_id, :created_at])
     |> foreign_key_constraint(:category_id)
     |> foreign_key_constraint(:user_id)

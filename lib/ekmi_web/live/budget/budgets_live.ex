@@ -19,7 +19,13 @@ defmodule EkmiWeb.BudgetsLive do
     if connected?(socket), do: Keihi.subscribe()
 
     [username, _domain] = String.split(socket.assigns.current_user.email, "@")
-    socket = assign(socket, username: String.capitalize(username), user_id: socket.assigns.current_user.id )
+
+    socket =
+      assign(socket,
+        username: String.capitalize(username),
+        user_id: socket.assigns.current_user.id
+      )
+
     socket =
       socket
       |> assign(username: String.capitalize(username), user_id: socket.assigns.current_user.id)
@@ -57,10 +63,11 @@ defmodule EkmiWeb.BudgetsLive do
       month: month
     }
 
-    selected_budget = case Keihi.find_budget(user_id, param_to_integer(params["id"], 0)) do
-      nil -> %{}
-      budget -> budget
-    end
+    selected_budget =
+      case Keihi.find_budget(user_id, param_to_integer(params["id"], 0)) do
+        nil -> %{}
+        budget -> budget
+      end
 
     budgets = Keihi.list_budgets(%{user_id: user_id}, options)
     total_budget_cost = Keihi.get_total_budget_cost(%{user_id: user_id})
@@ -68,6 +75,7 @@ defmodule EkmiWeb.BudgetsLive do
     balance = finance.balance
     remaining_balance = balance - total_budget_cost
     bal_percentage = remaining_balance / balance * 100
+
     socket =
       socket
       |> stream(:budgets, budgets)
@@ -99,6 +107,7 @@ defmodule EkmiWeb.BudgetsLive do
   @impl true
   def handle_info({:budget_created, budget}, socket) do
     budget = budget |> Repo.preload(:category)
+
     socket =
       socket
       |> stream_insert(:budgets, budget, at: 0)
@@ -111,6 +120,7 @@ defmodule EkmiWeb.BudgetsLive do
   @impl true
   def handle_info({:budget_updated, budget}, socket) do
     budget = budget |> Repo.preload(:category)
+
     socket =
       socket
       |> stream_insert(:budgets, budget)
@@ -134,9 +144,15 @@ defmodule EkmiWeb.BudgetsLive do
   attr :sort_by, :atom, required: true
   attr :options, :map, required: true
   slot :inner_block, required: true
+
   def sort_link(assigns) do
     ~H"""
-    <.link class="px-4 w-32 text-center" navigate={~p"/budgets?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"}>
+    <.link
+      class="px-4 w-32 text-center"
+      navigate={
+        ~p"/budgets?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"
+      }
+    >
       <%= render_slot(@inner_block) %>
       <%= sort_indicator(@sort_by, @options) %>
     </.link>
@@ -146,6 +162,7 @@ defmodule EkmiWeb.BudgetsLive do
   def filter_form(assigns) do
     date = format_date(%{year: assigns.options.year, month: assigns.options.month})
     assigns = assign(assigns, :date, date)
+
     ~H"""
     <form phx-change="filter">
       <input class="border-0 rounded-lg" id="budget_ym" type="month" name="budget_ym" value={@date} />
@@ -176,7 +193,8 @@ defmodule EkmiWeb.BudgetsLive do
     end
   end
 
-  defp sort_indicator(column, %{sort_by: sort_by, sort_order: sort_order}) when column == sort_by do
+  defp sort_indicator(column, %{sort_by: sort_by, sort_order: sort_order})
+       when column == sort_by do
     case sort_order do
       :asc -> "⬆️"
       :desc -> "⬇️"
@@ -186,6 +204,7 @@ defmodule EkmiWeb.BudgetsLive do
   defp sort_indicator(_, _), do: ""
 
   defp param_to_integer(nil, default), do: default
+
   defp param_to_integer(param, default) do
     case Integer.parse(param) do
       {number, _} ->
@@ -199,11 +218,13 @@ defmodule EkmiWeb.BudgetsLive do
   defp valid_sort_by(%{"sort_by" => sort_by}) when sort_by in ~w(category_id cost inserted_at) do
     String.to_atom(sort_by)
   end
+
   defp valid_sort_by(_params), do: :inserted_at
 
   defp valid_sort_order(%{"sort_order" => sort_order}) when sort_order in ~w(asc desc) do
     String.to_atom(sort_order)
   end
+
   defp valid_sort_order(_params), do: :desc
 
   defp budget_bar_color(bal_percentage) do

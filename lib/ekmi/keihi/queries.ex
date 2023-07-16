@@ -23,13 +23,21 @@ defmodule Ekmi.Keihi.Queries do
     |> limit(^per_page)
     |> offset(^offset)
   end
+
   def paginate(query, _options), do: query
 
   def records_for_month(query, %{year: year}) when is_nil(year), do: query
 
   def records_for_month(query, %{year: year, month: month}) do
     from(b in query,
-      where: fragment("extract(year from ?) = ? and extract(month from ?) = ?", b.created_at, ^year, b.created_at, ^month)
+      where:
+        fragment(
+          "extract(year from ?) = ? and extract(month from ?) = ?",
+          b.created_at,
+          ^year,
+          b.created_at,
+          ^month
+        )
     )
   end
 
@@ -38,5 +46,6 @@ defmodule Ekmi.Keihi.Queries do
   def sort(query, %{sort_by: sort_by, sort_order: sort_order}) do
     order_by(query, {^sort_order, ^sort_by})
   end
+
   def sort(query, _options), do: query
 end
