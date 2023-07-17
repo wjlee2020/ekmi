@@ -31,6 +31,7 @@ defmodule EkmiWeb.UserRegistrationLive do
           Oops, something went wrong! Please check the errors below.
         </.error>
 
+        <.input field={@form[:name]} label="Name" />
         <.input field={@form[:email]} type="email" label="Email" required />
         <.input field={@form[:password]} type="password" label="Password" required />
 
@@ -55,7 +56,7 @@ defmodule EkmiWeb.UserRegistrationLive do
 
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
-      {:ok, user} ->
+      {:ok, %{user: user}} ->
         {:ok, _} =
           Accounts.deliver_user_confirmation_instructions(
             user,

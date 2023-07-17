@@ -7,8 +7,11 @@ defmodule Ekmi.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
+    field :name, :string
+    field :has_partner, :boolean, default: false
 
     has_one :finance, Ekmi.Accounts.Finance
+    has_one :partner_relation, Ekmi.Accounts.Partner
     has_many :budgets, Ekmi.Keihi.Budget
 
     timestamps()
@@ -39,7 +42,7 @@ defmodule Ekmi.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :name])
     |> validate_email(opts)
     |> validate_password(opts)
   end
@@ -122,6 +125,12 @@ defmodule Ekmi.Accounts.User do
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password(opts)
+  end
+
+  def name_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name])
+    |> validate_length(:name, min: 3)
   end
 
   @doc """

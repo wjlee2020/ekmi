@@ -18,17 +18,9 @@ defmodule EkmiWeb.BudgetsLive do
   def mount(_params, _session, socket) do
     if connected?(socket), do: Keihi.subscribe()
 
-    [username, _domain] = String.split(socket.assigns.current_user.email, "@")
-
-    socket =
-      assign(socket,
-        username: String.capitalize(username),
-        user_id: socket.assigns.current_user.id
-      )
-
     socket =
       socket
-      |> assign(username: String.capitalize(username), user_id: socket.assigns.current_user.id)
+      |> assign(username: Accounts.current_username(socket.assigns.current_user), user_id: socket.assigns.current_user.id)
       |> allow_upload(
         :receipt_img,
         accept: ~w(.png .jpeg .jpg),
@@ -64,15 +56,15 @@ defmodule EkmiWeb.BudgetsLive do
     }
 
     selected_budget =
-      case Keihi.find_budget(user_id, param_to_integer(params["id"], 0)) do
+      case Keihi.find_budget(param_to_integer(params["id"], 0)) do
         nil -> %{}
         budget -> budget
       end
 
     budgets = Keihi.list_budgets(%{user_id: user_id}, options)
     total_budget_cost = Keihi.get_total_budget_cost(%{user_id: user_id})
-    finance = Accounts.get_finance(%{user_id: socket.assigns.current_user.id})
-    balance = finance.balance
+    balance = Accounts.get_finance(socket.assigns.current_user)
+
     remaining_balance = balance - total_budget_cost
     bal_percentage = remaining_balance / balance * 100
 

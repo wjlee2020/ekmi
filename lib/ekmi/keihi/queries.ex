@@ -2,7 +2,9 @@ defmodule Ekmi.Keihi.Queries do
   @moduledoc false
 
   import Ecto.Query
+  alias Ekmi.Accounts.User
   alias Ekmi.Keihi.Budget
+  alias Ekmi.Repo
 
   def where_user_and_budget_ids(%{user_id: user_id, budget_id: budget_id}) do
     from b in Budget,
@@ -11,9 +13,17 @@ defmodule Ekmi.Keihi.Queries do
   end
 
   def where_user(%{user_id: user_id}) do
-    from b in Budget,
-      where: b.user_id == ^user_id,
-      preload: [:category]
+    case Repo.get!(User, user_id) |> Repo.preload(:partner_relation) |> Map.get(:partner_relation) do
+      nil ->
+        from b in Budget,
+          where: b.user_id == ^user_id,
+          preload: [:category]
+
+      partner_relation ->
+        from b in Budget,
+          where: b.user_id == ^user_id or b.user_id == ^partner_relation.partner_id,
+          preload: [:category]
+    end
   end
 
   def paginate(query, %{page: page, per_page: per_page}) do
