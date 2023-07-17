@@ -4,8 +4,8 @@ defmodule Ekmi.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias Ekmi.Repo
 
+  alias Ekmi.Repo
   alias Ekmi.Accounts.{Finance, User, UserToken, UserNotifier}
 
   ## Database getters
@@ -75,9 +75,16 @@ defmodule Ekmi.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
+    user_changeset = %User{} |> User.registration_changeset(attrs)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:user, user_changeset)
+    |> Ecto.Multi.run(:finance, fn repo, %{user: user} ->
+      %Finance{}
+      |> change_finance(%{balance: 100000, currency: "JPY", user_id: user.id})
+      |> Repo.insert()
+    end)
+    |> Repo.transaction()
   end
 
   @doc """
@@ -106,6 +113,16 @@ defmodule Ekmi.Accounts do
   """
   def change_user_email(user, attrs \\ %{}) do
     User.email_changeset(user, attrs, validate_email: false)
+  end
+
+  def change_user_detail(%User{} = user, attrs \\ %{}) do
+    User.name_changeset(user, attrs)
+  end
+
+  def update_user_detail(user, attrs \\ %{}) do
+    user
+    |> User.name_changeset(attrs)
+    |> Repo.update()
   end
 
   @doc """
@@ -359,7 +376,7 @@ defmodule Ekmi.Accounts do
 
   def update_finance(user_id, attrs \\ %{}) do
     get_finance(%{user_id: user_id})
-    |> Finance.changeset(attrs)
+    |> change_finance(attrs)
     |> Repo.update()
   end
 
@@ -369,5 +386,12 @@ defmodule Ekmi.Accounts do
 
   def change_finance(%Finance{} = finance, attr \\ %{}) do
     Finance.changeset(finance, attr)
+  end
+
+  def current_username(current_user) do
+    current_user.name ||
+    current_user.email
+    |> String.split("@")
+    |> hd()
   end
 end

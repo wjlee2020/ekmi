@@ -7,6 +7,7 @@ defmodule Ekmi.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
+    field :name, :string
 
     has_one :finance, Ekmi.Accounts.Finance
     has_many :budgets, Ekmi.Keihi.Budget
@@ -122,6 +123,12 @@ defmodule Ekmi.Accounts.User do
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password(opts)
+  end
+
+  def name_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name])
+    |> validate_length(:name, min: 3)
   end
 
   @doc """

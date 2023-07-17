@@ -18,17 +18,9 @@ defmodule EkmiWeb.BudgetsLive do
   def mount(_params, _session, socket) do
     if connected?(socket), do: Keihi.subscribe()
 
-    [username, _domain] = String.split(socket.assigns.current_user.email, "@")
-
-    socket =
-      assign(socket,
-        username: String.capitalize(username),
-        user_id: socket.assigns.current_user.id
-      )
-
     socket =
       socket
-      |> assign(username: String.capitalize(username), user_id: socket.assigns.current_user.id)
+      |> assign(username: Accounts.current_username(socket.assigns.current_user), user_id: socket.assigns.current_user.id)
       |> allow_upload(
         :receipt_img,
         accept: ~w(.png .jpeg .jpg),
