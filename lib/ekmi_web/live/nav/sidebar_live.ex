@@ -14,7 +14,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
     <div class="relative">
       <button
         phx-click={toggle_sidebar()}
-        class="absolute -top-16 sm:-top-16 sm:-left-32 inline-flex items-center justify-center p-2 w-10 h-10 ml-3 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        class="absolute -top-16 sm:-top-16 sm:-left-32 inline-flex items-center justify-center p-2 w-10 h-10 ml-3 text-sm rounded-lg focus:outline-none focus:ring-2 text-gray-400 hover:bg-gray-700 focus:ring-gray-600"
         aria-controls="navbar-hamburger"
         aria-expanded="false"
       >
@@ -44,14 +44,14 @@ defmodule EkmiWeb.Nav.SidebarLive do
 
       <div
         id="main-sidebar"
-        class={"z-10 h-full w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-50 dark:bg-gray-800 #{unless @show_cart, do: "hidden"}"}
+        class={"z-10 h-full w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-800 #{unless @show_cart, do: "hidden"}"}
       >
         <button
           phx-click={toggle_sidebar()}
           type="button"
           data-drawer-hide="drawer-example"
           aria-controls="drawer-example"
-          class="w-10 h-10 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 right-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white"
+          class="w-10 h-10 text-gray-400 bg-transparent rounded-lg text-sm w-8 h-8 absolute top-2.5 right-2.5 inline-flex items-center justify-center hover:bg-gray-600 hover:text-white"
         >
           <svg
             class="w-3 h-3"
@@ -77,7 +77,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
             class="h-6 mr-3 sm:h-7"
             alt="Flowbite Logo"
           />
-          <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
+          <span class="self-center text-xl font-semibold whitespace-nowrap text-white">
             Ekmi
           </span>
         </.link>
@@ -86,7 +86,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
           <li>
             <.link
               navigate={~p"/budgets"}
-              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -109,7 +109,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
           <li>
             <.link
               navigate={~p"/messages"}
-              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -131,7 +131,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
           <li>
             <.link
               navigate={~p"/users/settings"}
-              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

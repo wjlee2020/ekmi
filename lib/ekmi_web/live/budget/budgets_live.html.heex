@@ -20,7 +20,7 @@
 
 <Budgets.Components.monthly_balance balance={@balance} remaining_balance={@remaining_balance} />
 
-<div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+<div class="w-full rounded-full h-2.5 mb-4 bg-gray-700">
   <div
     class="animated-width h-2.5 rounded-full"
     style={"width: #{@bal_percentage}%; background-color: #{budget_bar_color(@bal_percentage)}"}
@@ -28,7 +28,7 @@
   </div>
 </div>
 
-<hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
+<hr class="h-px my-8 border-0 bg-gray-700" />
 
 <div class="flex flex-col sm:flex-row items-center gap-4">
   <.sort_link sort_by={:category_id} options={@options}>
@@ -54,7 +54,7 @@
       :for={{budget_id, budget} <- @streams.budgets}
       id={budget_id}
       patch={~p"/budgets/#{budget}?#{@options}"}
-      class="w-fit"
+      class="w-full sm:w-fit"
     >
       <Budgets.Components.tiles budget={budget} />
     </.link>
@@ -64,7 +64,7 @@
 <div class="mb-4 flex items-center justify-center gap-2">
   <.link
     :if={@options.page > 1}
-    class="flex items-center justify-center px-3 h-8 text-sm font-medium text-slate-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-slate-200 dark:hover:bg-gray-700 dark:hover:text-white"
+    class="flex items-center justify-center px-3 h-8 text-sm font-medium border rounded-lg  bg-gray-800 border-gray-700 text-slate-200 hover:bg-gray-700 hover:text-white"
     patch={~p"/budgets?#{%{@options | page: @options.page - 1}}"}
   >
     Prev
@@ -80,7 +80,7 @@
 
   <.link
     :if={more_pages?(@options, @budgets_count)}
-    class="flex items-center justify-center px-3 h-8 text-sm font-medium text-slate-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-slate-200 dark:hover:bg-gray-700 dark:hover:text-white"
+    class="flex items-center justify-center px-3 h-8 text-sm font-medium border rounded-lg bg-gray-800 border-gray-700 text-slate-200 hover:bg-gray-700 hover:text-white"
     patch={~p"/budgets?#{%{@options | page: @options.page + 1}}"}
   >
     Next
@@ -91,7 +91,7 @@
       <label for="per-page">Per-Page</label>
 
       <select
-        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm text-center inline-flex items-center dark:bg-gray-800 dark:hover:bg-gray-700"
+        class="text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm text-center inline-flex items-center bg-gray-800 hover:bg-gray-700"
         name="per-page"
       >
         <%= Phoenix.HTML.Form.options_for_select(
@@ -105,7 +105,7 @@
 
 <.link
   patch={~p"/budgets/new?#{@options}"}
-  class="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+  class="py-2.5 px-5 mr-2 mb-2 text-sm font-mediumfocus:outline-none rounded-lg border focus:z-10 focus:ring-4 focus:ring-gray-700 bg-gray-800 text-gray-200 border-gray-600 hover:text-white hover:bg-gray-700"
 >
   Add a budget
 </.link>

@@ -26,7 +26,7 @@ defmodule EkmiWeb.MessagesLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="h-[35rem] grid p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div class="h-[30rem] grid p-6 border rounded-lg shadow bg-gray-800 border-gray-700">
       <div
         id="messages"
         phx-update="stream"
@@ -117,10 +117,10 @@ defmodule EkmiWeb.MessagesLive do
       style="margin-top: auto;"
     >
       <label for="chat" class="sr-only">Your message</label>
-      <div class="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
+      <div class="flex items-center px-3 py-2 rounded-lg bg-gray-700">
         <button
           type="button"
-          class="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
+          class="inline-flex justify-center p-2 rounded-lg cursor-pointer text-gray-400 hover:text-white hover:bg-gray-600"
         >
           <svg
             class="w-5 h-5"
@@ -166,7 +166,7 @@ defmodule EkmiWeb.MessagesLive do
 
         <button
           type="submit"
-          class="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600"
+          class="inline-flex justify-center p-2 rounded-full cursor-pointer text-blue-500 hover:bg-gray-600"
         >
           <svg
             class="w-5 h-5 rotate-90"
