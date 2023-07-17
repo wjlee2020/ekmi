@@ -56,15 +56,15 @@ defmodule EkmiWeb.BudgetsLive do
     }
 
     selected_budget =
-      case Keihi.find_budget(user_id, param_to_integer(params["id"], 0)) do
+      case Keihi.find_budget(param_to_integer(params["id"], 0)) do
         nil -> %{}
         budget -> budget
       end
 
     budgets = Keihi.list_budgets(%{user_id: user_id}, options)
     total_budget_cost = Keihi.get_total_budget_cost(%{user_id: user_id})
-    finance = Accounts.get_finance(%{user_id: socket.assigns.current_user.id})
-    balance = finance.balance
+    balance = Accounts.get_finance(socket.assigns.current_user)
+
     remaining_balance = balance - total_budget_cost
     bal_percentage = remaining_balance / balance * 100
 

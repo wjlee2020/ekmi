@@ -8,8 +8,10 @@ defmodule Ekmi.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
     field :name, :string
+    field :has_partner, :boolean, default: false
 
     has_one :finance, Ekmi.Accounts.Finance
+    has_one :partner_relation, Ekmi.Accounts.Partner
     has_many :budgets, Ekmi.Keihi.Budget
 
     timestamps()

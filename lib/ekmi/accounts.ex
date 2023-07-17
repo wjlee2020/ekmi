@@ -384,6 +384,17 @@ defmodule Ekmi.Accounts do
     Repo.get_by(Finance, user_id: user_id)
   end
 
+  def get_finance(%User{} = user) do
+    case user.has_partner do
+      true ->
+        %{partner_relation: %{balance: balance}} = Repo.preload(user, :partner_relation)
+        balance
+
+      false ->
+        get_finance(%{user_id: user.id})
+    end
+  end
+
   def change_finance(%Finance{} = finance, attr \\ %{}) do
     Finance.changeset(finance, attr)
   end

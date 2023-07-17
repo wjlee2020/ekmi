@@ -125,7 +125,6 @@ defmodule Ekmi.Keihi do
     |> Queries.paginate(options)
     |> Queries.records_for_month(options)
     |> Repo.all()
-    |> Repo.preload(:category)
   end
 
   @spec list_budgets(%{:user_id => integer()}) :: [budget]
