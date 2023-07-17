@@ -93,10 +93,17 @@ defmodule EkmiWeb.MessagesLive do
 
   @impl true
   def handle_info({:message_sent, message}, socket) do
+    message_form =
+      %Message{}
+      |> Chat.change_message()
+      |> to_form()
+
     message = Repo.preload(message, [:sender, :receiver])
+
     socket =
       socket
       |> stream_insert(:messages, message, at: -1)
+      |> assign(message_form: message_form)
 
     {:noreply, socket}
   end
