@@ -12,6 +12,8 @@ defmodule Ekmi.Application do
       EkmiWeb.Telemetry,
       # Start the Ecto repository
       Ekmi.Repo,
+      # Oban
+      {Oban, Application.fetch_env!(:ekmi, Oban)},
       # Start the PubSub system
       {Phoenix.PubSub, name: Ekmi.PubSub},
       # Start Finch

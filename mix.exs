@@ -52,7 +52,8 @@ defmodule Ekmi.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:ex_cldr, "~> 2.37"},
-      {:ex_cldr_numbers, "~> 2.31"}
+      {:ex_cldr_numbers, "~> 2.31"},
+      {:oban, "~> 2.14"}
     ]
   end
 
