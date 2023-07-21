@@ -5,7 +5,7 @@ defmodule Ekmi.Accounts.Finance do
   @derive {Jason.Encoder, only: ~w(balance currency scheduled_deposit_amount)a}
 
   schema "finances" do
-    field :balance, :integer, default: 200000
+    field :balance, :integer, default: 200_000
     field :currency, :string
     field :scheduled_deposit_amount, :integer
     belongs_to :user, Ekmi.Accounts.User

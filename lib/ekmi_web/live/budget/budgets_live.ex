@@ -20,7 +20,10 @@ defmodule EkmiWeb.BudgetsLive do
 
     socket =
       socket
-      |> assign(username: Accounts.current_username(socket.assigns.current_user), user_id: socket.assigns.current_user.id)
+      |> assign(
+        username: Accounts.current_username(socket.assigns.current_user),
+        user_id: socket.assigns.current_user.id
+      )
       |> allow_upload(
         :receipt_img,
         accept: ~w(.png .jpeg .jpg),
@@ -63,7 +66,7 @@ defmodule EkmiWeb.BudgetsLive do
 
     budgets = Keihi.list_budgets(%{user_id: user_id}, options)
     total_budget_cost = Keihi.get_total_budget_cost(%{user_id: user_id})
-    balance = Accounts.get_finance(socket.assigns.current_user)
+    balance = Accounts.get_balance(socket.assigns.current_user)
 
     remaining_balance = balance - total_budget_cost
     bal_percentage = remaining_balance / balance * 100

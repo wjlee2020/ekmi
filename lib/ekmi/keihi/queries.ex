@@ -13,7 +13,9 @@ defmodule Ekmi.Keihi.Queries do
   end
 
   def where_user(%{user_id: user_id}) do
-    case Repo.get!(User, user_id) |> Repo.preload(:partner_relation) |> Map.get(:partner_relation) do
+    case Repo.get!(User, user_id)
+         |> Repo.preload(:partner_relation)
+         |> Map.get(:partner_relation) do
       nil ->
         from b in Budget,
           where: b.user_id == ^user_id,

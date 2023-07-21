@@ -31,9 +31,10 @@ defmodule Ekmi.Chat do
   def broadcast({:error, _reason} = error, _tag), do: error
 
   def list_messages(sender_id) do
-    query = from(m in Message,
-    where: m.sender_id == ^sender_id
-  )
+    query =
+      from(m in Message,
+        where: m.sender_id == ^sender_id
+      )
 
     Repo.all(query)
   end

@@ -32,7 +32,7 @@ defmodule EkmiWeb.MessagesLive do
         phx-update="stream"
         phx-hook="ScrollDown"
         class="flex flex-col gap-4 overflow-scroll"
-        data-scrolled-to-top={"false"}
+        data-scrolled-to-top="false"
       >
         <div
           :for={{message_id, message} <- @streams.messages}
@@ -51,11 +51,7 @@ defmodule EkmiWeb.MessagesLive do
         </div>
       </div>
 
-      <.message_input
-        message_form={@message_form}
-        sender_id={@sender_id}
-        receiver_id={@receiver_id}
-      />
+      <.message_input message_form={@message_form} sender_id={@sender_id} receiver_id={@receiver_id} />
     </div>
     """
   end
@@ -110,12 +106,7 @@ defmodule EkmiWeb.MessagesLive do
 
   def message_input(assigns) do
     ~H"""
-    <.form
-      for={@message_form}
-      phx-change="validate"
-      phx-submit="send"
-      style="margin-top: auto;"
-    >
+    <.form for={@message_form} phx-change="validate" phx-submit="send" style="margin-top: auto;">
       <label for="chat" class="sr-only">Your message</label>
       <div class="flex items-center px-3 py-2 rounded-lg bg-gray-700">
         <button

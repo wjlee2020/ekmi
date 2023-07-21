@@ -10,6 +10,9 @@ defmodule Ekmi.Accounts do
   alias Ekmi.Repo
   alias Ekmi.Workers.FinanceWorker
 
+  @type ecto_changeset :: Ecto.Changeset.t()
+  @type finance :: %Finance{}
+
   ## Database getters
 
   @doc """
@@ -83,11 +86,16 @@ defmodule Ekmi.Accounts do
     |> Multi.insert(:user, user_changeset)
     |> Multi.run(:finance, fn _repo, %{user: user} ->
       %Finance{}
-      |> change_finance(%{balance: 100000, currency: "JPY", scheduled_deposit_amount: 100000, user_id: user.id})
+      |> change_finance(%{
+        balance: 100_000,
+        currency: "JPY",
+        scheduled_deposit_amount: 100_000,
+        user_id: user.id
+      })
       |> Repo.insert()
     end)
-    |> Multi.run(:oban_job, fn _repo, %{finance: finance, user: user} ->
-      FinanceWorker.new(%{finance: finance, user: user})
+    |> Multi.run(:oban_job, fn _repo, %{user: user} ->
+      FinanceWorker.new(%{user: user})
       |> Oban.insert()
     end)
     |> Repo.transaction()
@@ -374,19 +382,68 @@ defmodule Ekmi.Accounts do
     end
   end
 
+  @doc """
+  Creates user's finance based on attrs.
+
+  ## Parameters
+      - `attrs`: a map that contains the finance fields.
+
+  ## Returns
+      - {:ok, %Ekmi.Accounts.Finance{}} if successful.
+      - {:error, %Ecto.Changeset{}} if errored.
+
+  ## Examples
+      iex> Ekmi.Accounts.create_finance(%{balance: 100000, currency: "JPY", scheduled_deposit_amount: 100000})
+      {:ok, %Ekmi.Accounts.Finance{}}
+  """
+  @spec create_finance(map()) :: {:ok, finance()} | {:error, ecto_changeset()}
   def create_finance(attrs) do
     %Finance{}
     |> change_finance(attrs)
     |> Repo.insert()
   end
 
+  @doc """
+  Grabs user finance and updates according to the given `attrs`.
+
+  ## Parameters
+      - `user_id` - integer which represents the user id.
+      - `attrs` - map containing the finance fields to update.
+
+  ## Returns
+      - `{:ok, %Ekmi.Accounts.Finance{}}` on success.
+      - `{:error, Ecto.Changeset}` on error.
+
+  ## Examples
+      iex> Ekmi.Accounts.update_finance(1, %{balance: 100000})
+      {:ok, %Ekmi.Accounts.Finance{}}
+
+  """
+  @spec update_finance(integer(), map()) :: {:ok, finance()} | {:error, ecto_changeset()}
   def update_finance(user_id, attrs \\ %{}) do
     get_finance(%{user_id: user_id})
     |> change_finance(attrs)
     |> Repo.update()
   end
 
-  def update_balance(user_id, _attrs) do
+  @doc """
+  Grabs finance based on user id and updates by adding to the balance, its scheduled deposit amount.
+
+  ## Parameters
+      - `user_id` - integer which represents the user id.
+
+  ## Returns
+      - {:ok, %Ekmi.Accounts.Finance{}} on success.
+      - {:error, Ecto.Changeset} on error.
+
+  ## Example
+      iex> Ekmi.Accounts.update_balance_by_scheduled_deposit_amount(1)
+      {:ok, %Ekmi.Accounts.Finance{}}
+
+  """
+  @spec update_balance_by_scheduled_deposit_amount(integer()) ::
+          {:ok, finance()} | {:error, ecto_changeset()}
+  def update_balance_by_scheduled_deposit_amount(user_id) do
     finance = get_finance(%{user_id: user_id})
     new_balance = finance.balance + finance.scheduled_deposit_amount
 
@@ -395,11 +452,35 @@ defmodule Ekmi.Accounts do
     |> Repo.update()
   end
 
+  @doc """
+  Grabs user finance based on given user id else returns nil.
+
+  ## Parameters
+      - `user_id` - integer which represents the user id.
+
+  ## Returns
+      - %Ekmi.Accounts.Finance{} if found.
+      - nil if no finance found for the user.
+
+  """
+  @spec get_finance(%{:user_id => integer()}) :: finance() | term()
   def get_finance(%{user_id: user_id}) do
-    Repo.get_by(Finance, user_id: user_id)
+    Repo.get_by!(Finance, user_id: user_id)
   end
 
-  def get_finance(%User{} = user) do
+  @doc """
+  Grabs user finance balance.
+
+  ## Parameters
+      - %Ekmi.Accounts.User{} - the user struct pertaining to the balance.
+
+  ## Returns
+      - `balance` - integer representing the user current balance.
+          - if user has a partner, it returns the partner_relation finance balance
+
+  """
+  @spec get_balance(%User{}) :: integer()
+  def get_balance(%User{} = user) do
     case user.has_partner do
       true ->
         %{partner_relation: %{balance: balance}} = Repo.preload(user, :partner_relation)
@@ -414,10 +495,21 @@ defmodule Ekmi.Accounts do
     Finance.changeset(finance, attr)
   end
 
+  @doc """
+  Grabs the user name if it exists. Otherwise, splits the user email at "@" and returns the hd().
+
+  ## Parameter
+      - `current_user` - current user in the `conn`.
+
+  ## Returns
+      - `current_user.name` - if `name` exist.
+      - `current_user.email` - split at "@", returning the hd().
+
+  """
   def current_username(current_user) do
     current_user.name ||
-    current_user.email
-    |> String.split("@")
-    |> hd()
+      current_user.email
+      |> String.split("@")
+      |> hd()
   end
 end

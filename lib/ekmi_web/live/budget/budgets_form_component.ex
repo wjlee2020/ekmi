@@ -167,7 +167,10 @@ defmodule EkmiWeb.BudgetsFormComponent do
           />
 
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-            <div :for={{img_location, index} <- Enum.with_index(@selected_budget.receipt_img)} class="relative">
+            <div
+              :for={{img_location, index} <- Enum.with_index(@selected_budget.receipt_img)}
+              class="relative"
+            >
               <img class="h-64 max-w-full rounded-lg object-cover" src={img_location} />
 
               <a
@@ -175,11 +178,10 @@ defmodule EkmiWeb.BudgetsFormComponent do
                 phx-click="remove_img"
                 phx-value-ref={index}
                 phx-target={@myself}
-                >
-                  &times;
-                </a>
+              >
+                &times;
+              </a>
             </div>
-
           </div>
 
           <.button class="mt-2" phx-disable-with="Loading...">Update</.button>

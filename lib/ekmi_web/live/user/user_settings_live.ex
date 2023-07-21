@@ -19,7 +19,12 @@ defmodule EkmiWeb.UserSettingsLive do
           phx-change="validate_balance"
         >
           <.input field={@finance_form[:balance]} type="number" label="Your Balance" required />
-          <.input field={@finance_form[:scheduled_deposit_amount]} type="number" label="Amount to deposit" required />
+          <.input
+            field={@finance_form[:scheduled_deposit_amount]}
+            type="number"
+            label="Amount to deposit"
+            required
+          />
           <.input
             field={@finance_form[:currency]}
             type="select"
@@ -245,6 +250,7 @@ defmodule EkmiWeb.UserSettingsLive do
     case Accounts.update_user_detail(socket.assigns.current_user, user_params) do
       {:ok, user} ->
         user_changeset = Accounts.change_user_detail(user)
+
         socket =
           socket
           |> put_flash(:info, "Updated user!")
