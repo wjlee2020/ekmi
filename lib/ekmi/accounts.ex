@@ -83,7 +83,7 @@ defmodule Ekmi.Accounts do
     |> Multi.insert(:user, user_changeset)
     |> Multi.run(:finance, fn _repo, %{user: user} ->
       %Finance{}
-      |> change_finance(%{balance: 100000, currency: "JPY", user_id: user.id})
+      |> change_finance(%{balance: 100000, currency: "JPY", scheduled_deposit_amount: 100000, user_id: user.id})
       |> Repo.insert()
     end)
     |> Multi.run(:oban_job, fn _repo, %{finance: finance, user: user} ->
@@ -388,7 +388,7 @@ defmodule Ekmi.Accounts do
 
   def update_balance(user_id, _attrs) do
     finance = get_finance(%{user_id: user_id})
-    new_balance = finance.balance + finance.balance
+    new_balance = finance.balance + finance.scheduled_deposit_amount
 
     finance
     |> Finance.balance_changeset(%{balance: new_balance})
@@ -406,7 +406,7 @@ defmodule Ekmi.Accounts do
         balance
 
       false ->
-        get_finance(%{user_id: user.id})
+        get_finance(%{user_id: user.id}).balance
     end
   end
 

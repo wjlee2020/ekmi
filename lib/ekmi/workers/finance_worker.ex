@@ -6,7 +6,7 @@ defmodule Ekmi.Workers.FinanceWorker do
   @impl true
   def perform(%{args: %{"finance" => finance, "user" => user} = args, attempt: 1}) do
     args
-    |> new(schedule_in: 1)
+    |> new(schedule_in: 15)
     |> Oban.insert!()
 
     Accounts.update_balance(user["id"], finance)

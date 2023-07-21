@@ -157,7 +157,7 @@ defmodule Ekmi.Keihi do
     Repo.one(Queries.where_user_and_budget_ids(%{user_id: user_id, budget_id: budget_id}))
   end
 
-  @spec find_budget(budget_id) :: budget
+  @spec find_budget(budget_id) :: budget | nil
   def find_budget(budget_id) do
     Repo.get(Budget, budget_id)
   end

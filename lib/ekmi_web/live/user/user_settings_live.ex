@@ -19,6 +19,7 @@ defmodule EkmiWeb.UserSettingsLive do
           phx-change="validate_balance"
         >
           <.input field={@finance_form[:balance]} type="number" label="Your Balance" required />
+          <.input field={@finance_form[:scheduled_deposit_amount]} type="number" label="Amount to deposit" required />
           <.input
             field={@finance_form[:currency]}
             type="select"

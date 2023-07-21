@@ -16,8 +16,8 @@ defmodule Ekmi.Accounts.Finance do
   @doc false
   def changeset(finance, attrs) do
     finance
-    |> cast(attrs, [:balance, :currency, :user_id])
-    |> validate_required([:balance, :currency, :user_id])
+    |> cast(attrs, [:balance, :currency, :scheduled_deposit_amount, :user_id])
+    |> validate_required([:balance, :currency, :scheduled_deposit_amount, :user_id])
     |> validate_length(:currency, min: 3, max: 3)
     |> foreign_key_constraint(:user_id)
   end
@@ -26,5 +26,11 @@ defmodule Ekmi.Accounts.Finance do
     finance
     |> cast(attrs, [:balance])
     |> validate_required([:balance])
+  end
+
+  def deposit_amount_changeset(finance, attrs) do
+    finance
+    |> cast(attrs, [:scheduled_deposit_amount])
+    |> validate_required([:scheduled_deposit_amount])
   end
 end
