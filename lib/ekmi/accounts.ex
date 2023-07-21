@@ -5,8 +5,10 @@ defmodule Ekmi.Accounts do
 
   import Ecto.Query, warn: false
 
-  alias Ekmi.Repo
+  alias Ecto.Multi
   alias Ekmi.Accounts.{Finance, User, UserToken, UserNotifier}
+  alias Ekmi.Repo
+  alias Ekmi.Workers.FinanceWorker
 
   ## Database getters
 
@@ -77,12 +79,16 @@ defmodule Ekmi.Accounts do
   def register_user(attrs) do
     user_changeset = %User{} |> User.registration_changeset(attrs)
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert(:user, user_changeset)
-    |> Ecto.Multi.run(:finance, fn repo, %{user: user} ->
+    Multi.new()
+    |> Multi.insert(:user, user_changeset)
+    |> Multi.run(:finance, fn _repo, %{user: user} ->
       %Finance{}
       |> change_finance(%{balance: 100000, currency: "JPY", user_id: user.id})
       |> Repo.insert()
+    end)
+    |> Multi.run(:oban_job, fn _repo, %{finance: finance, user: user} ->
+      FinanceWorker.new(%{finance: finance, user: user})
+      |> Oban.insert()
     end)
     |> Repo.transaction()
   end
@@ -169,9 +175,9 @@ defmodule Ekmi.Accounts do
       |> User.email_changeset(%{email: email})
       |> User.confirm_changeset()
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, [context]))
+    Multi.new()
+    |> Multi.update(:user, changeset)
+    |> Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, [context]))
   end
 
   @doc ~S"""
@@ -222,9 +228,9 @@ defmodule Ekmi.Accounts do
       |> User.password_changeset(attrs)
       |> User.validate_current_password(password)
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
+    Multi.new()
+    |> Multi.update(:user, changeset)
+    |> Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
     |> Repo.transaction()
     |> case do
       {:ok, %{user: user}} -> {:ok, user}
@@ -301,9 +307,9 @@ defmodule Ekmi.Accounts do
   end
 
   defp confirm_user_multi(user) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, User.confirm_changeset(user))
-    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, ["confirm"]))
+    Multi.new()
+    |> Multi.update(:user, User.confirm_changeset(user))
+    |> Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, ["confirm"]))
   end
 
   ## Reset password
@@ -358,9 +364,9 @@ defmodule Ekmi.Accounts do
 
   """
   def reset_user_password(user, attrs) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, User.password_changeset(user, attrs))
-    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
+    Multi.new()
+    |> Multi.update(:user, User.password_changeset(user, attrs))
+    |> Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
     |> Repo.transaction()
     |> case do
       {:ok, %{user: user}} -> {:ok, user}
@@ -377,6 +383,15 @@ defmodule Ekmi.Accounts do
   def update_finance(user_id, attrs \\ %{}) do
     get_finance(%{user_id: user_id})
     |> change_finance(attrs)
+    |> Repo.update()
+  end
+
+  def update_balance(user_id, _attrs) do
+    finance = get_finance(%{user_id: user_id})
+    new_balance = finance.balance + finance.balance
+
+    finance
+    |> Finance.balance_changeset(%{balance: new_balance})
     |> Repo.update()
   end
 
