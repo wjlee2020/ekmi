@@ -12,6 +12,7 @@ defmodule Ekmi.Accounts.User do
     field :name, :string
     field :has_partner, :boolean, default: false
     field :partner_requested, :boolean, default: false
+    field :requested_email, :string
 
     has_one :finance, Ekmi.Accounts.Finance
     has_one :partner_relation, Ekmi.Accounts.Partner
@@ -134,6 +135,12 @@ defmodule Ekmi.Accounts.User do
     user
     |> cast(attrs, [:name])
     |> validate_length(:name, min: 3)
+  end
+
+  def requested_partner_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:partner_requested, :requested_email])
+    |> validate_required([:partner_requested, :requested_email])
   end
 
   @doc """

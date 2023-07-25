@@ -382,10 +382,19 @@ defmodule Ekmi.Accounts do
     end
   end
 
-  def set_partner(%{email: email}) do
-    case get_user_by_email(email) do
+  def set_partner(%{current_user: current_user, partner_email: partner_email}) do
+    case get_user_by_email(partner_email) do
       nil -> {:error, "Failed to find user. Please try again"}
-      user -> {:ok, user}
+      user ->
+        c_user_request_changeset =
+          requested_partner_changeset(current_user, %{partner_requested: true, requested_email: partner_email})
+        p_user_request_changeset =
+          requested_partner_changeset(user, %{partner_requested: true, requested_email: current_user.email})
+
+        Multi.new()
+        |> Multi.update(:update_current_user, c_user_request_changeset)
+        |> Multi.update(:update_requested_user, p_user_request_changeset)
+        |> Repo.transaction()
     end
   end
 
