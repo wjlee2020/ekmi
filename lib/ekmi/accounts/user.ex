@@ -11,6 +11,7 @@ defmodule Ekmi.Accounts.User do
     field :confirmed_at, :naive_datetime
     field :name, :string
     field :has_partner, :boolean, default: false
+    field :partner_requested, :boolean, default: false
 
     has_one :finance, Ekmi.Accounts.Finance
     has_one :partner_relation, Ekmi.Accounts.Partner

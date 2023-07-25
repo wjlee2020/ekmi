@@ -382,6 +382,13 @@ defmodule Ekmi.Accounts do
     end
   end
 
+  def set_partner(%{email: email}) do
+    case get_user_by_email(email) do
+      nil -> {:error, "Failed to find user. Please try again"}
+      user -> {:ok, user}
+    end
+  end
+
   @doc """
   Creates user's finance based on attrs.
 

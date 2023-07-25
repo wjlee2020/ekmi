@@ -4,7 +4,8 @@ defmodule EkmiWeb.Budgets.Components do
   alias Ekmi.Cldr
   alias Ekmi.Keihi.Budget
 
-  attr :budget, Budget
+  attr :budget, Budget, required: true
+  attr :user_id, :integer, required: true
 
   def tiles(assigns) do
     emoji =
@@ -17,33 +18,38 @@ defmodule EkmiWeb.Budgets.Components do
         6 -> "𖧢"
       end
 
-    assigns = assign(assigns, :emoji, emoji)
+    is_current_users_budget = assigns.budget.user_id == assigns.user_id
+
+    assigns =
+      assigns
+      |> assign(:emoji, emoji)
+      |> assign(:is_current_users_budget, is_current_users_budget)
 
     ~H"""
-    <%= if is_nil(@budget) do %>
-      <div>something</div>
-    <% else %>
-      <div class="w-full sm:w-[23rem] h-[200px] flex flex-col justify-between budget-card block max-w-sm p-6 border rounded-lg shadow bg-gray-800 border-gray-700 hover:bg-gray-700">
-        <h5 class="mb-2 text-2xl font-bold tracking-tight text-white">
-          <%= String.capitalize(@budget.title) %>
-          <%= @emoji %>
-        </h5>
+    <div class={"
+      w-full sm:w-[23rem] h-[200px] flex flex-col justify-between budget-card block
+      max-w-sm p-6 border rounded-lg shadow
+      #{if @is_current_users_budget do "bg-gray-800 border-gray-700 hover:bg-gray-700" else "bg-gray-800 border-gray-700 hover:bg-gray-700" end}
+    "}>
+      <h5 class="mb-2 text-2xl font-bold tracking-tight text-white">
+        <%= String.capitalize(@budget.title) %>
+        <%= @emoji %>
+      </h5>
 
-        <h6 class="mb-2 text-1xl font-bold tracking-tight text-white overflow-scroll">
-          <%= @budget.description %>
-        </h6>
+      <h6 class="mb-2 text-1xl font-bold tracking-tight text-white overflow-scroll">
+        <%= @budget.description %>
+      </h6>
 
-        <div class="flex justify-between gap-4">
-          <p class="font-normal text-gray-400 text-end">
-            <%= @budget.created_at %>
-          </p>
+      <div class="flex justify-between gap-4">
+        <p class="font-normal text-gray-400 text-end">
+          <%= @budget.created_at %>
+        </p>
 
-          <p class="font-normal text-gray-400 text-end">
-            <%= @budget.cost %>円
-          </p>
-        </div>
+        <p class="font-normal text-gray-400 text-end">
+          <%= @budget.cost %>円
+        </p>
       </div>
-    <% end %>
+    </div>
     """
   end
 

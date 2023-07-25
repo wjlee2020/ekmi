@@ -72,11 +72,11 @@ defmodule EkmiWeb.Nav.SidebarLive do
         </button>
 
         <.link navigate={~p"/budgets"} class="flex items-center pl-2.5 mb-5">
-          <img
+          <%!-- <img
             src="https://flowbite.com/docs/images/logo.svg"
             class="h-6 mr-3 sm:h-7"
             alt="Flowbite Logo"
-          />
+          /> --%>
           <span class="self-center text-xl font-semibold whitespace-nowrap text-white">
             Ekmi
           </span>

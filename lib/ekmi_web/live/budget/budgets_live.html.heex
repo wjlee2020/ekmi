@@ -56,7 +56,7 @@
       patch={~p"/budgets/#{budget}?#{@options}"}
       class="w-full sm:w-fit"
     >
-      <Budgets.Components.tiles budget={budget} />
+      <Budgets.Components.tiles budget={budget} user_id={@user_id} />
     </.link>
   </div>
 <% end %>
