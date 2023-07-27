@@ -6,12 +6,13 @@ defmodule Ekmi.Accounts do
   import Ecto.Query, warn: false
 
   alias Ecto.Multi
-  alias Ekmi.Accounts.{Finance, User, UserToken, UserNotifier}
+  alias Ekmi.Accounts.{Finance, Partner, User, UserToken, UserNotifier}
   alias Ekmi.Repo
   alias Ekmi.Workers.FinanceWorker
 
   @type ecto_changeset :: Ecto.Changeset.t()
   @type finance :: %Finance{}
+  @user_not_found "Failed to find user. Please try again."
 
   ## Database getters
 
@@ -382,19 +383,41 @@ defmodule Ekmi.Accounts do
     end
   end
 
-  def set_partner(%{current_user: current_user, partner_email: partner_email}) do
+  def request_partner(%{current_user: current_user, partner_email: partner_email}) do
     case get_user_by_email(partner_email) do
-      nil -> {:error, "Failed to find user. Please try again"}
-      user ->
+      nil -> {:error, @user_not_found}
+      _user = partner_user ->
         c_user_request_changeset =
-          requested_partner_changeset(current_user, %{partner_requested: true, requested_email: partner_email})
+          User.requested_partner_changeset(current_user, %{partner_requested: true, requested_email: partner_email})
         p_user_request_changeset =
-          requested_partner_changeset(user, %{partner_requested: true, requested_email: current_user.email})
+          User.requested_partner_changeset(partner_user, %{partner_requested: true, requested_email: current_user.email})
 
         Multi.new()
         |> Multi.update(:update_current_user, c_user_request_changeset)
         |> Multi.update(:update_requested_user, p_user_request_changeset)
         |> Repo.transaction()
+    end
+  end
+
+  def set_partner(current_user, partner_user) do
+    with {:ok, user_one} <- is_requested_partner(current_user),
+    {:ok, user_two} <- is_requested_partner(partner_user) do
+
+      total_balance = user_one.finance.balance + user_two.finance.balance
+
+      user_one_partner_change = request_partner_change(user_one.partner_relation, %{user_id: user_one.id, partner_id: user_two.id, balance: total_balance})
+      user_two_partner_change = request_partner_change(user_two.partner_relation, %{user_id: user_two.id, partner_id: user_one.id, balance: total_balance})
+
+      Multi.new()
+      |> Multi.insert(:insert_partner_one, user_one_partner_change)
+      |> Multi.insert(:insert_partner_two, user_two_partner_change)
+      |> Multi.update(:update_user_one, fn _repo ->
+        User.update_partner_changeset(user_one, %{has_partner: true})
+      end)
+      |> Multi.update(:update_user_two, fn _repo ->
+        User.update_partner_changeset(user_two, %{has_partner: true})
+      end)
+      |> Repo.transaction()
     end
   end
 
@@ -511,6 +534,10 @@ defmodule Ekmi.Accounts do
     Finance.changeset(finance, attr)
   end
 
+  def request_partner_change(%Partner{} = partner, attr \\ %{}) do
+    Partner.changeset(partner, attr)
+  end
+
   @doc """
   Grabs the user name if it exists. Otherwise, splits the user email at "@" and returns the hd().
 
@@ -527,5 +554,14 @@ defmodule Ekmi.Accounts do
       current_user.email
       |> String.split("@")
       |> hd()
+  end
+
+  defp is_requested_partner(%{partner_requested: partner_requested} = user) do
+    with true <- partner_requested do
+      user = Repo.preload(user, [:finance, :partner_relation])
+      {:ok, user}
+    else
+      false -> IO.inspect(user, label: "PARTNER REQUESTED")
+    end
   end
 end

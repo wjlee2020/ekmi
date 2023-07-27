@@ -13,6 +13,21 @@ defmodule EkmiWeb.UserSettingsLive do
     <div class="space-y-12 divide-y lg:w-[600px] mx-auto">
       <div>
         <.simple_form
+          for={@name_form}
+          id="name_form"
+          phx-submit="update_name"
+          phx-change="validate_name"
+        >
+          <.input field={@name_form[:name]} label="Name" />
+
+          <:actions>
+            <.button phx-disable-with="Changing...">Change Name</.button>
+          </:actions>
+        </.simple_form>
+      </div>
+
+      <div>
+        <.simple_form
           for={@finance_form}
           id="balance_form"
           phx-submit="update_balance"
@@ -59,21 +74,6 @@ defmodule EkmiWeb.UserSettingsLive do
           />
           <:actions>
             <.button phx-disable-with="Changing...">Change Email</.button>
-          </:actions>
-        </.simple_form>
-      </div>
-
-      <div>
-        <.simple_form
-          for={@name_form}
-          id="name_form"
-          phx-submit="update_name"
-          phx-change="validate_name"
-        >
-          <.input field={@name_form[:name]} label="Name" />
-
-          <:actions>
-            <.button phx-disable-with="Changing...">Change Name</.button>
           </:actions>
         </.simple_form>
       </div>

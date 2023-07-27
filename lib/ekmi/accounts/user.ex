@@ -143,6 +143,12 @@ defmodule Ekmi.Accounts.User do
     |> validate_required([:partner_requested, :requested_email])
   end
 
+  def update_partner_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:has_partner])
+    |> validate_required([:has_partner])
+  end
+
   @doc """
   Confirms the account by setting `confirmed_at`.
   """
