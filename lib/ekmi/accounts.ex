@@ -383,6 +383,16 @@ defmodule Ekmi.Accounts do
     end
   end
 
+  @doc """
+  Finds another user by email to request being partners.
+
+  ## Parameters
+      - %{current_user: %User{]}, partner_email: String.t()}
+
+  ## Returns
+      - {:error, String.t()} - If no partner is found by their email.
+      - {:ok, Multi} :: {:error, Multi.name}
+  """
   def request_partner(%{current_user: current_user, partner_email: partner_email}) do
     case get_user_by_email(partner_email) do
       nil ->
@@ -408,6 +418,17 @@ defmodule Ekmi.Accounts do
     end
   end
 
+  @doc """
+  Sets partner_relation for both current_user and the partner_user.
+
+  ## Parameters
+      - current_user - %User{}, the logged in user.
+      - parnter_user - %User{}, the user to partner with.
+
+  ## Returns
+      - {:ok, Multi} - on success.
+      - {:error, Multi.name} - should the transaction rollback.
+  """
   def set_partner(current_user, partner_user) do
     with {:ok, user_one} <- is_requested_partner(current_user),
          {:ok, user_two} <- is_requested_partner(partner_user) do
