@@ -385,12 +385,21 @@ defmodule Ekmi.Accounts do
 
   def request_partner(%{current_user: current_user, partner_email: partner_email}) do
     case get_user_by_email(partner_email) do
-      nil -> {:error, @user_not_found}
+      nil ->
+        {:error, @user_not_found}
+
       _user = partner_user ->
         c_user_request_changeset =
-          User.requested_partner_changeset(current_user, %{partner_requested: true, requested_email: partner_email})
+          User.requested_partner_changeset(current_user, %{
+            partner_requested: true,
+            requested_email: partner_email
+          })
+
         p_user_request_changeset =
-          User.requested_partner_changeset(partner_user, %{partner_requested: true, requested_email: current_user.email})
+          User.requested_partner_changeset(partner_user, %{
+            partner_requested: true,
+            requested_email: current_user.email
+          })
 
         Multi.new()
         |> Multi.update(:update_current_user, c_user_request_changeset)
@@ -401,12 +410,22 @@ defmodule Ekmi.Accounts do
 
   def set_partner(current_user, partner_user) do
     with {:ok, user_one} <- is_requested_partner(current_user),
-    {:ok, user_two} <- is_requested_partner(partner_user) do
-
+         {:ok, user_two} <- is_requested_partner(partner_user) do
       total_balance = user_one.finance.balance + user_two.finance.balance
 
-      user_one_partner_change = request_partner_change(user_one.partner_relation, %{user_id: user_one.id, partner_id: user_two.id, balance: total_balance})
-      user_two_partner_change = request_partner_change(user_two.partner_relation, %{user_id: user_two.id, partner_id: user_one.id, balance: total_balance})
+      user_one_partner_change =
+        request_partner_change(user_one.partner_relation, %{
+          user_id: user_one.id,
+          partner_id: user_two.id,
+          balance: total_balance
+        })
+
+      user_two_partner_change =
+        request_partner_change(user_two.partner_relation, %{
+          user_id: user_two.id,
+          partner_id: user_one.id,
+          balance: total_balance
+        })
 
       Multi.new()
       |> Multi.insert(:insert_partner_one, user_one_partner_change)
