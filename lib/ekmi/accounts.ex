@@ -494,15 +494,27 @@ defmodule Ekmi.Accounts do
       - `{:error, Ecto.Changeset}` on error.
 
   ## Examples
-      iex> Ekmi.Accounts.update_finance(1, %{balance: 100000})
+      iex> Ekmi.Accounts.update_finance(%{user_id: 1, attrs: %{balance: 100000}})
       {:ok, %Ekmi.Accounts.Finance{}}
 
   """
-  @spec update_finance(integer(), map()) :: {:ok, finance()} | {:error, ecto_changeset()}
-  def update_finance(user_id, attrs \\ %{}) do
+  def update_finance(%{user_id: user_id, attrs: attrs}) do
     get_finance(%{user_id: user_id})
     |> change_finance(attrs)
     |> Repo.update()
+  end
+
+  def update_finance(%User{} = user, attrs) do
+    user = Repo.preload(user, :partner_relation)
+
+    Multi.new()
+    |> Multi.update(:update_user_balance, fn _repo ->
+      get_finance(%{user_id: user.id})
+      |> change_finance(attrs)
+    end)
+    |> Multi.update(:update_partner_rel_balance, fn _repo ->
+      request_partner_change(user.partner_relation, attrs)
+    end)
   end
 
   @doc """

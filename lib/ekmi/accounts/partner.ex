@@ -17,4 +17,10 @@ defmodule Ekmi.Accounts.Partner do
     |> assoc_constraint(:user)
     |> foreign_key_constraint(:partner_id)
   end
+
+  def partner_balance_changeset(partner, attrs) do
+    partner
+    |> cast(attrs, [:balance])
+    |> validate_required([:balance])
+  end
 end

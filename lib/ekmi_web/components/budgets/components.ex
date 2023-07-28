@@ -1,5 +1,5 @@
 defmodule EkmiWeb.Budgets.Components do
-  use Phoenix.Component
+  use EkmiWeb, :html
 
   alias Ekmi.Cldr
   alias Ekmi.Keihi.Budget
@@ -28,8 +28,8 @@ defmodule EkmiWeb.Budgets.Components do
     ~H"""
     <div class={"
       w-full sm:w-[23rem] h-[200px] flex flex-col justify-between budget-card block
-      max-w-sm p-6 border rounded-lg shadow
-      #{if @is_current_users_budget do "bg-gray-800 border-gray-700 hover:bg-gray-700" else "bg-gray-800 border-gray-700 hover:bg-gray-700" end}
+      max-w-sm p-6 border rounded-lg shadow border-gray-700 hover:bg-gray-700
+      #{if @is_current_users_budget do "bg-[#111827]" else "bg-[#111827]" end}
     "}>
       <h5 class="mb-2 text-2xl font-bold tracking-tight text-white">
         <%= String.capitalize(@budget.title) %>

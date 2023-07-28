@@ -2,6 +2,7 @@ defmodule EkmiWeb.UserSettingsLive do
   use EkmiWeb, :live_view
 
   alias Ekmi.Accounts
+  alias EkmiWeb.Finance
 
   def render(assigns) do
     ~H"""
@@ -26,34 +27,7 @@ defmodule EkmiWeb.UserSettingsLive do
         </.simple_form>
       </div>
 
-      <div>
-        <.simple_form
-          for={@finance_form}
-          id="balance_form"
-          phx-submit="update_balance"
-          phx-change="validate_balance"
-        >
-          <.input field={@finance_form[:balance]} type="number" label="Your Balance" required />
-          <.input
-            field={@finance_form[:scheduled_deposit_amount]}
-            type="number"
-            label="Amount to deposit"
-            required
-          />
-          <.input
-            field={@finance_form[:currency]}
-            type="select"
-            label="Currency"
-            required
-            options={["USD", "JPY"]}
-          />
-          <.input field={@finance_form[:user_id]} type="hidden" />
-
-          <:actions>
-            <.button phx-disable-with="Changing...">Change Balance</.button>
-          </:actions>
-        </.simple_form>
-      </div>
+      <Finance.Components.finance_form finance_form={@finance_form} />
 
       <div>
         <.simple_form
@@ -180,7 +154,9 @@ defmodule EkmiWeb.UserSettingsLive do
   def handle_event("update_balance", params, socket) do
     %{"finance" => finance_params} = params
 
-    case Accounts.update_finance(finance_params["user_id"], finance_params) do
+    IO.inspect(socket.assigns)
+
+    case Accounts.update_finance(%{user_id: finance_params["user_id"], attrs: finance_params}) do
       {:ok, finance} ->
         finance_changeset = Accounts.change_finance(finance)
 
