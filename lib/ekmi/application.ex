@@ -16,6 +16,8 @@ defmodule Ekmi.Application do
       {Oban, Application.fetch_env!(:ekmi, Oban)},
       # Start the PubSub system
       {Phoenix.PubSub, name: Ekmi.PubSub},
+      # Presence PubSub
+      EkmiWeb.Presence,
       # Start Finch
       {Finch, name: Ekmi.Finch},
       # Start the Endpoint (http/https)
