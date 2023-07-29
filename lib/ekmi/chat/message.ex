@@ -14,7 +14,6 @@ defmodule Ekmi.Chat.Message do
   def changeset(message, attrs) do
     message
     |> cast(attrs, [:content, :sender_id, :receiver_id])
-    |> validate_required([:content])
     |> foreign_key_constraint(:sender_id)
     |> foreign_key_constraint(:receiver_id)
   end

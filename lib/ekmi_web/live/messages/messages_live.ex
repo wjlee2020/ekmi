@@ -1,15 +1,28 @@
 defmodule EkmiWeb.MessagesLive do
   use EkmiWeb, :live_view
 
-  alias Ekmi.Chat
+  alias Ekmi.{Accounts, Chat}
   alias Ekmi.Chat.Message
   alias Ekmi.Repo
+  alias EkmiWeb.Presence
+
+  @topic "users:chatroom"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    if connected?(socket), do: Chat.subscribe()
+    %{current_user: current_user} = socket.assigns
 
-    sender_id = socket.assigns.current_user.id
+    if connected?(socket) do
+      Chat.subscribe()
+
+      {:ok, _ref} = Presence.track(self(), @topic, current_user.id, %{
+        username: Accounts.current_username(current_user),
+        is_typing: false,
+      })
+    end
+
+    presences = simple_presence_map(Presence.list(@topic))
+
     changset = Chat.change_message(%Message{})
     messages = Chat.list_messages()
 
@@ -17,8 +30,10 @@ defmodule EkmiWeb.MessagesLive do
       socket
       |> stream(:messages, messages)
       |> assign(:message_form, to_form(changset))
-      |> assign(:sender_id, sender_id)
+      |> assign(:sender_id, current_user.id)
       |> assign(:receiver_id, 1)
+      |> assign(:presences, presences)
+      |> assign(:is_typing, false)
 
     {:ok, socket}
   end
@@ -26,43 +41,64 @@ defmodule EkmiWeb.MessagesLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="h-[30rem] grid p-6 border rounded-lg shadow bg-gray-800 border-gray-700">
-      <div
-        id="messages"
-        phx-update="stream"
-        phx-hook="ScrollDown"
-        class="flex flex-col gap-4 overflow-scroll"
-        data-scrolled-to-top="false"
-      >
+    <div>
+      <ul>
+        <li :for={{_user_id, meta} <- @presences}>
+          <span>
+            <%= if meta.is_typing, do: "#{meta.username} is typing...", else: "😀" %>
+          </span>
+          <span>
+            <%= meta.username %>
+          </span>
+        </li>
+      </ul>
+
+      <div class="h-[30rem] grid p-6 border rounded-lg shadow bg-gray-800 border-gray-700">
         <div
-          :for={{message_id, message} <- @streams.messages}
-          id={message_id}
-          class="mb-4"
-          style={"align-self: #{message_align(%{sender_email: message.sender.email, current_user_email: assigns.current_user.email})}"}
+          id="messages"
+          phx-update="stream"
+          phx-hook="ScrollDown"
+          class="flex flex-col gap-4 overflow-scroll"
+          data-scrolled-to-top="false"
         >
           <div
-            class="flex flex-col p-4 rounded-lg"
-            style={"background-color: #{message_style(%{sender_email: message.sender.email, current_user_email: assigns.current_user.email})}"}
+            :for={{message_id, message} <- @streams.messages}
+            id={message_id}
+            class="mb-4"
+            style={"align-self: #{message_align(%{sender_email: message.sender.email, current_user_email: assigns.current_user.email})}"}
           >
-            <span>
-              <%= message.content %>
-            </span>
+            <div
+              class="flex flex-col p-4 rounded-lg"
+              style={"background-color: #{message_style(%{sender_email: message.sender.email, current_user_email: assigns.current_user.email})}"}
+            >
+              <span>
+                <%= message.content %>
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <.message_input message_form={@message_form} sender_id={@sender_id} receiver_id={@receiver_id} />
+        <.message_input message_form={@message_form} sender_id={@sender_id} receiver_id={@receiver_id} />
+      </div>
     </div>
     """
   end
 
   @impl true
   def handle_event("validate", %{"message" => message}, socket) do
+    socket = update(socket, :is_typing, fn _ -> true end)
+
+    %{current_user: current_user} = socket.assigns
+    %{metas: [meta | _]} = Presence.get_by_key(@topic, current_user.id)
+    new_meta = %{meta | is_typing: socket.assigns.is_typing}
+
     message_form =
       %Message{}
       |> Chat.change_message(message)
       |> Map.put(:action, :validate)
       |> to_form()
+
+    Presence.update(self(), @topic, current_user.id, new_meta)
 
     {:noreply, assign(socket, message_form: message_form)}
   end
@@ -100,6 +136,15 @@ defmodule EkmiWeb.MessagesLive do
       socket
       |> stream_insert(:messages, message, at: -1)
       |> assign(message_form: message_form)
+
+    {:noreply, socket}
+  end
+
+  def handle_info(%{event: "presence_diff", payload: diff}, socket) do
+    socket =
+      socket
+      |> remove_presences(diff.leaves)
+      |> add_presences(diff.joins)
 
     {:noreply, socket}
   end
@@ -173,6 +218,23 @@ defmodule EkmiWeb.MessagesLive do
       </div>
     </.form>
     """
+  end
+
+  defp simple_presence_map(presences) do
+    Enum.into(presences, %{}, fn {user_id, %{metas: [meta | _]}} ->
+      {user_id, meta}
+    end)
+  end
+
+  defp remove_presences(socket, leaves) do
+    user_ids = Enum.map(leaves, fn {user_id, _meta} -> user_id end)
+    presences = Map.drop(socket.assigns.presences, user_ids)
+    assign(socket, :presences, presences)
+  end
+
+  defp add_presences(socket, joins) do
+    presences = Map.merge(socket.assigns.presences, simple_presence_map(joins))
+    assign(socket, :presences, presences)
   end
 
   defp message_align(%{sender_email: sender_email, current_user_email: current_user_email}) do

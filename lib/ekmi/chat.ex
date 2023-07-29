@@ -7,6 +7,7 @@ defmodule Ekmi.Chat do
   alias Ekmi.Repo
 
   @topic inspect(__MODULE__)
+  @chatroom_topic "users:chatroom"
   @pubsub Ekmi.PubSub
   @type ecto_changeset :: Ecto.Changeset.t()
   @type message :: %Message{}
@@ -14,6 +15,7 @@ defmodule Ekmi.Chat do
   @spec subscribe :: :ok | {:error, {:already_registered, pid}}
   def subscribe do
     Phoenix.PubSub.subscribe(@pubsub, @topic)
+    Phoenix.PubSub.subscribe(@pubsub, @chatroom_topic)
   end
 
   @spec broadcast({:error, ecto_changeset} | {:ok, message}, atom()) ::
