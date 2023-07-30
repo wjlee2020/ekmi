@@ -9,7 +9,7 @@ defmodule EkmiWeb.MessagesInputComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div class="flex flex-col">
       <.form
         for={@message_form}
         phx-change="validate"

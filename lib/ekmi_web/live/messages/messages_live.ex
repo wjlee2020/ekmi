@@ -43,9 +43,12 @@ defmodule EkmiWeb.MessagesLive do
     ~H"""
     <div class="grid grid-cols-3">
       <ul>
-        online
+        Online
 
-        <li :for={{_user_id, meta} <- @presences}>
+        <li
+          :for={{_user_id, meta} <- @presences}
+          class="mt-3"
+        >
           <span>
             🟢
           </span>
@@ -55,7 +58,7 @@ defmodule EkmiWeb.MessagesLive do
         </li>
       </ul>
 
-      <div class="h-[30rem] grid col-span-2 p-6 border rounded-lg shadow bg-gray-800 border-gray-700">
+      <div class="h-[80vh] grid col-span-2 p-6 border rounded-lg shadow bg-gray-800 border-gray-700">
         <div
           id="messages"
           phx-update="stream"
