@@ -154,8 +154,6 @@ defmodule EkmiWeb.UserSettingsLive do
   def handle_event("update_balance", params, socket) do
     %{"finance" => finance_params} = params
 
-    IO.inspect(socket.assigns)
-
     case Accounts.update_finance(%{user_id: finance_params["user_id"], attrs: finance_params}) do
       {:ok, finance} ->
         finance_changeset = Accounts.change_finance(finance)
