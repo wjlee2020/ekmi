@@ -10,12 +10,7 @@ defmodule EkmiWeb.MessagesInputComponent do
   def render(assigns) do
     ~H"""
     <div class="flex flex-col">
-      <.form
-        for={@message_form}
-        phx-change="validate"
-        phx-submit="send"
-        style="margin-top: auto;"
-      >
+      <.form for={@message_form} phx-change="validate" phx-submit="send" style="margin-top: auto;">
         <label for="chat" class="sr-only">Your message</label>
 
         <div class="flex items-center px-3 py-2 rounded-lg bg-gray-700">
@@ -60,14 +55,12 @@ defmodule EkmiWeb.MessagesInputComponent do
             placeholder="Send a message"
             autocomplete="off"
             style="min-height: auto; width: 95%; margin: 12px auto;"
-            disabled={is_nil(@receiver_id) == true}
           />
 
           <.input type="hidden" field={@message_form[:sender_id]} value={@sender_id} />
           <.input type="hidden" field={@message_form[:receiver_id]} value={@receiver_id} />
 
           <button
-            disabled={is_nil(@receiver_id) == true}
             type="submit"
             class="inline-flex justify-center p-2 rounded-full cursor-pointer text-blue-500 hover:bg-gray-600"
           >

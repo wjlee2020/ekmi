@@ -15,10 +15,11 @@ defmodule EkmiWeb.MessagesLive do
     if connected?(socket) do
       Chat.subscribe()
 
-      {:ok, _ref} = Presence.track(self(), @topic, current_user.id, %{
-        username: Accounts.current_username(current_user),
-        is_typing: false,
-      })
+      {:ok, _ref} =
+        Presence.track(self(), @topic, current_user.id, %{
+          username: Accounts.current_username(current_user),
+          is_typing: false
+        })
     end
 
     presences = simple_presence_map(Presence.list(@topic))
@@ -44,11 +45,7 @@ defmodule EkmiWeb.MessagesLive do
     <div class="grid grid-cols-3">
       <ul>
         Online
-
-        <li
-          :for={{_user_id, meta} <- @presences}
-          class="mt-3"
-        >
+        <li :for={{_user_id, meta} <- @presences} class="mt-3">
           <span>
             🟢
           </span>
@@ -175,15 +172,20 @@ defmodule EkmiWeb.MessagesLive do
   defp add_presences(socket, joins) do
     presences = Map.merge(socket.assigns.presences, simple_presence_map(joins))
 
-    socket = Map.filter(presences, fn {key, _v} -> key !== Integer.to_string(socket.assigns.current_user.id) end)
-    |> Map.keys
-    |> add_receiver(socket)
+    socket =
+      Map.filter(presences, fn {key, _v} ->
+        key !== Integer.to_string(socket.assigns.current_user.id)
+      end)
+      |> Map.keys()
+      |> add_receiver(socket)
 
     assign(socket, :presences, presences)
   end
 
   defp add_receiver(_keys = [], socket), do: socket
-  defp add_receiver(keys, socket), do: assign(socket, :receiver_id, String.to_integer(hd(keys)))
+
+  defp add_receiver(keys, socket),
+    do: assign(socket, :receiver_id, keys |> hd() |> String.to_integer())
 
   defp message_align(%{sender_email: sender_email, current_user_email: current_user_email}) do
     cond do
