@@ -85,7 +85,7 @@ defmodule Ekmi.Accounts do
 
     Multi.new()
     |> Multi.insert(:user, user_changeset)
-    |> Multi.run(:finance, fn _repo, %{user: user} ->
+    |> Multi.insert(:finance, fn %{user: user} ->
       %Finance{}
       |> change_finance(%{
         balance: 100_000,
@@ -93,7 +93,6 @@ defmodule Ekmi.Accounts do
         scheduled_deposit_amount: 100_000,
         user_id: user.id
       })
-      |> Repo.insert()
     end)
     |> Multi.run(:oban_job, fn _repo, %{user: user} ->
       FinanceWorker.new(%{user: user})
