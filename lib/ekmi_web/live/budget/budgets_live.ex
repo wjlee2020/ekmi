@@ -101,37 +101,40 @@ defmodule EkmiWeb.BudgetsLive do
 
   @impl true
   def handle_info({:budget_created, budget}, socket) do
+    %{options: options} = socket.assigns
     budget = budget |> Repo.preload(:category)
 
     socket =
       socket
       |> stream_insert(:budgets, budget, at: 0)
       |> put_flash(:info, "Created budget!")
-      |> push_navigate(to: ~p"/budgets")
+      |> push_navigate(to: ~p"/budgets?#{options}")
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_info({:budget_updated, budget}, socket) do
+    %{options: options} = socket.assigns
     budget = budget |> Repo.preload(:category)
 
     socket =
       socket
       |> stream_insert(:budgets, budget)
       |> put_flash(:info, "Budget updated")
-      |> push_navigate(to: ~p"/budgets")
+      |> push_navigate(to: ~p"/budgets?#{options}")
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_info({:budget_deleted, budget}, socket) do
+    %{options: options} = socket.assigns
     socket =
       socket
       |> stream_delete(:budgets, budget)
       |> put_flash(:info, "Deleted budget!")
-      |> push_patch(to: ~p"/budgets")
+      |> push_patch(to: ~p"/budgets?#{options}")
 
     {:noreply, socket}
   end

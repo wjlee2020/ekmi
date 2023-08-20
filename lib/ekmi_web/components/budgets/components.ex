@@ -8,6 +8,7 @@ defmodule EkmiWeb.Budgets.Components do
   attr :user_id, :integer, required: true
 
   def tiles(assigns) do
+    IO.inspect(assigns, label: "assigns")
     emoji =
       case assigns.budget.category.id do
         1 -> "🍛"
