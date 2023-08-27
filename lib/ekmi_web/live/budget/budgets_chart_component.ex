@@ -25,14 +25,15 @@ defmodule EkmiWeb.BudgetsChartComponent do
     ~H"""
     <div class="mt-36">
       <hr class="h-px bg-gray-200 border-0 dark:bg-gray-700" />
-
-      <canvas
-        id="budget-chart"
-        phx-hook="BudgetChart"
-        class="mt-32"
-        data-budgets={Jason.encode!(@budget_list)}
-      >
-      </canvas>
+      <div class="w-96">
+        <canvas
+          id="budget-chart"
+          phx-hook="BudgetChart"
+          class="mt-32"
+          data-budgets={Jason.encode!(@budget_list)}
+        >
+        </canvas>
+      </div>
     </div>
     """
   end
