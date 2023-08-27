@@ -59,7 +59,7 @@ defmodule EkmiWeb.BudgetsLive do
     }
 
     budgets = Keihi.list_budgets(current_user, options)
-    {total_count, total_budget_cost} = Keihi.get_budget_count_and_total(current_user)
+    {total_count, total_budget_cost} = Keihi.get_budget_count_and_total(current_user, %{year: year, month: month})
     balance = Accounts.get_balance(current_user)
 
     remaining_balance = balance - total_budget_cost
@@ -109,16 +109,14 @@ defmodule EkmiWeb.BudgetsLive do
 
   @impl true
   def handle_info({:budget_updated, budget}, socket) do
-    %{options: options} = socket.assigns
     budget = budget |> Repo.preload(:category)
 
     socket =
       socket
       |> stream_insert(:budgets, budget)
       |> put_flash(:info, "Budget updated")
-      |> push_navigate(to: ~p"/budgets?#{options}")
 
-    {:noreply, socket}
+    {:noreply, assign(socket, live_action: :index, selected_budget: %{})}
   end
 
   @impl true
