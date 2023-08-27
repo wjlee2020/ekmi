@@ -37,7 +37,7 @@ defmodule EkmiWeb.BudgetsLive do
 
   @impl true
   def handle_params(params, _uri, socket) do
-    user_id = socket.assigns.current_user.id
+    current_user = socket.assigns.current_user
     sort_by = valid_sort_by(params)
     sort_order = valid_sort_order(params)
 
@@ -58,9 +58,9 @@ defmodule EkmiWeb.BudgetsLive do
       month: month
     }
 
-    budgets = Keihi.list_budgets(%{user_id: user_id}, options)
-    total_budget_cost = Keihi.get_total_budget_cost(%{user_id: user_id})
-    balance = Accounts.get_balance(socket.assigns.current_user)
+    budgets = Keihi.list_budgets(current_user, options)
+    total_budget_cost = Keihi.get_total_budget_cost(current_user)
+    balance = Accounts.get_balance(current_user)
 
     remaining_balance = balance - total_budget_cost
     bal_percentage = remaining_balance / balance * 100
@@ -124,6 +124,7 @@ defmodule EkmiWeb.BudgetsLive do
   @impl true
   def handle_info({:budget_deleted, budget}, socket) do
     %{options: options} = socket.assigns
+
     socket =
       socket
       |> stream_delete(:budgets, budget)

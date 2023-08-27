@@ -12,18 +12,18 @@ defmodule Ekmi.Keihi.Queries do
       preload: [:category]
   end
 
-  def where_user(%{user_id: user_id}) do
-    case Repo.get!(User, user_id)
+  def where_user(user = %User{}) do
+    case user
          |> Repo.preload(:partner_relation)
          |> Map.get(:partner_relation) do
       nil ->
         from b in Budget,
-          where: b.user_id == ^user_id,
+          where: b.user_id == ^user.id,
           preload: [:category]
 
       partner_relation ->
         from b in Budget,
-          where: b.user_id == ^user_id or b.user_id == ^partner_relation.partner_id,
+          where: b.user_id == ^user.id or b.user_id == ^partner_relation.partner_id,
           preload: [:category]
     end
   end

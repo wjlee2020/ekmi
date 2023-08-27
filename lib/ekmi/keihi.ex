@@ -4,6 +4,7 @@ defmodule Ekmi.Keihi do
   """
   @moduledoc since: "1.0.0"
 
+  alias Ekmi.Accounts.User
   alias Ekmi.Keihi.{Budget, Queries}
   alias Ekmi.Repo
 
@@ -100,7 +101,7 @@ defmodule Ekmi.Keihi do
   Get all budgets with preloaded category with sorting, pagination, and filtering by month.
 
   ## Parameters
-    - `user`: a map containing a `:user_id` key associated with the ID of the user.
+    - `user`: currently logged in user (or just a User struct).
     - `options`: a map that can contain keys for sorting (`:sort`), pagination (`:page`, `:page_size`),
     and filtering by month (`:year`, `:month`). The values for these keys should be appropriate for
     the `Queries.sort/2`, `Queries.paginate/2`, and `Queries.records_for_month/2` functions respectively.
@@ -112,24 +113,24 @@ defmodule Ekmi.Keihi do
       Each `Budget` struct will have its associated `:category` preloaded.
 
   ## Examples
-      iex> Ekmi.Keihi.list_budgets(%{user_id: 1}, %{sort: :desc, page: 1, page_size: 10, year: 2023, month: 7})
+      iex> Ekmi.Keihi.list_budgets(%User{id: 1}, %{sort: :desc, page: 1, page_size: 10, year: 2023, month: 7})
       [%Ekmi.Keihi.Budget{}]
 
-      iex> Ekmi.Keihi.list_budgets(%{user_id: 1})
+      iex> Ekmi.Keihi.list_budgets(%User{id: 1})
       [%Ekmi.Keihi.Budget{}]
   """
-  @spec list_budgets(%{required(:user_id) => integer()}, options) :: [budget]
-  def list_budgets(%{user_id: user_id}, options) when is_map(options) do
-    Queries.where_user(%{user_id: user_id})
+  @spec list_budgets(%User{}, map()) :: [budget]
+  def list_budgets(user = %User{}, options) when is_map(options) do
+    Queries.where_user(user)
     |> Queries.sort(options)
     |> Queries.paginate(options)
     |> Queries.records_for_month(options)
     |> Repo.all()
   end
 
-  @spec list_budgets(%{:user_id => integer()}) :: [budget]
-  def list_budgets(%{user_id: user_id}) do
-    Queries.where_user(%{user_id: user_id})
+  @spec list_budgets(%User{}) :: [budget]
+  def list_budgets(user = %User{}) do
+    Queries.where_user(user)
     |> Repo.all()
   end
 
@@ -176,18 +177,18 @@ defmodule Ekmi.Keihi do
   Calculates the total cost of all budgets for a given user.
 
   ## Parameters
-    - `params`: a map that contains the user_id key and its corresponding value.
+    - `user`: User struct.
 
   ## Returns
     - An integer representing the total cost of all budgets for the provided user.
 
   ## Examples
-      iex> Ekmi.Keihi.get_total_budget_cost(%{user_id: 1})
+      iex> Ekmi.Keihi.get_total_budget_cost(%User{id: 1})
       5000
   """
-  @spec get_total_budget_cost(%{user_id: user_id}) :: integer()
-  def get_total_budget_cost(%{user_id: _user_id} = params) do
-    list_budgets(params)
+  @spec get_total_budget_cost(%User{}) :: integer()
+  def get_total_budget_cost(user = %User{}) do
+    list_budgets(user)
     |> Enum.reduce(0, fn budget, acc -> acc + budget.cost end)
   end
 
@@ -195,19 +196,19 @@ defmodule Ekmi.Keihi do
   Calculates the total cost of all budgets for a given user within specific options.
 
   ## Parameters
-      - `params`: a map that contains the user_id key and its corresponding value.
+      - `user`: User struct.
       - `options`: a map that provides additional parameters for fetching the budgets. This could be sorting options, pagination options, etc.
 
   ## Returns
       - An integer representing the total cost of all budgets for the provided user within the given options.
 
   ## Examples
-      iex> Ekmi.Keihi.get_total_budget_cost(%{user_id: 1}, %{sort: :desc, page: 2})
+      iex> Ekmi.Keihi.get_total_budget_cost(%User{user: 1}, %{sort: :desc, page: 2})
       2500
   """
-  @spec get_total_budget_cost(%{user_id: user_id}, options) :: integer()
-  def get_total_budget_cost(params, options) do
-    list_budgets(params, options)
+  @spec get_total_budget_cost(%User{}, map()) :: integer()
+  def get_total_budget_cost(user = %User{}, options) do
+    list_budgets(user, options)
     |> Enum.reduce(0, fn budget, acc -> acc + budget.cost end)
   end
 end
