@@ -180,16 +180,18 @@ defmodule Ekmi.Keihi do
     - `user`: User struct.
 
   ## Returns
-    - An integer representing the total cost of all budgets for the provided user.
+    - A tuple containing the total count of and the cost of all budgets for the provided user.
 
   ## Examples
-      iex> Ekmi.Keihi.get_total_budget_cost(%User{id: 1})
-      5000
+      iex> Ekmi.Keihi.get_budget_count_and_total(%User{id: 1})
+      {3, 5000}
   """
-  @spec get_total_budget_cost(%User{}) :: integer()
-  def get_total_budget_cost(user = %User{}) do
+  @spec get_budget_count_and_total(%User{}) :: {integer(), integer()}
+  def get_budget_count_and_total(user = %User{}) do
     list_budgets(user)
-    |> Enum.reduce(0, fn budget, acc -> acc + budget.cost end)
+    |> Enum.reduce({0, 0}, fn budget, {count, total} ->
+      {count + 1, total + budget.cost}
+    end)
   end
 
   @doc """
@@ -200,15 +202,17 @@ defmodule Ekmi.Keihi do
       - `options`: a map that provides additional parameters for fetching the budgets. This could be sorting options, pagination options, etc.
 
   ## Returns
-      - An integer representing the total cost of all budgets for the provided user within the given options.
+      - A tuple containing the total count of and the cost of all budgets for the provided user.
 
   ## Examples
-      iex> Ekmi.Keihi.get_total_budget_cost(%User{user: 1}, %{sort: :desc, page: 2})
-      2500
+      iex> Ekmi.Keihi.get_budget_count_and_total(%User{user: 1}, %{sort: :desc, page: 2})
+      {3, 5000}
   """
-  @spec get_total_budget_cost(%User{}, map()) :: integer()
-  def get_total_budget_cost(user = %User{}, options) do
+  @spec get_budget_count_and_total(%User{}) :: {integer(), integer()}
+  def get_budget_count_and_total(user = %User{}, options) do
     list_budgets(user, options)
-    |> Enum.reduce(0, fn budget, acc -> acc + budget.cost end)
+    |> Enum.reduce({0, 0}, fn budget, {count, total} ->
+      {count + 1, total + budget.cost}
+    end)
   end
 end

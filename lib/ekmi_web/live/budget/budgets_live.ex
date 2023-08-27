@@ -59,7 +59,7 @@ defmodule EkmiWeb.BudgetsLive do
     }
 
     budgets = Keihi.list_budgets(current_user, options)
-    total_budget_cost = Keihi.get_total_budget_cost(current_user)
+    {total_count, total_budget_cost} = Keihi.get_budget_count_and_total(current_user)
     balance = Accounts.get_balance(current_user)
 
     remaining_balance = balance - total_budget_cost
@@ -69,7 +69,7 @@ defmodule EkmiWeb.BudgetsLive do
       socket
       |> stream(:budgets, budgets, reset: true)
       |> assign(:selected_budget, select_budget(budgets, param_to_integer(params["id"], 0)))
-      |> assign(:budgets_count, Keihi.budgets_count())
+      |> assign(:budgets_count, total_count)
       |> assign(:balance, balance)
       |> assign(:remaining_balance, remaining_balance)
       |> assign(:bal_percentage, bal_percentage)
