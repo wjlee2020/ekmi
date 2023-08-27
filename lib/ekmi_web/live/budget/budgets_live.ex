@@ -58,12 +58,6 @@ defmodule EkmiWeb.BudgetsLive do
       month: month
     }
 
-    selected_budget =
-      case Keihi.find_budget(param_to_integer(params["id"], 0)) do
-        nil -> %{}
-        budget -> budget
-      end
-
     budgets = Keihi.list_budgets(%{user_id: user_id}, options)
     total_budget_cost = Keihi.get_total_budget_cost(%{user_id: user_id})
     balance = Accounts.get_balance(socket.assigns.current_user)
@@ -73,8 +67,8 @@ defmodule EkmiWeb.BudgetsLive do
 
     socket =
       socket
-      |> stream(:budgets, budgets)
-      |> assign(:selected_budget, selected_budget)
+      |> stream(:budgets, budgets, reset: true)
+      |> assign(:selected_budget, select_budget(budgets, param_to_integer(params["id"], 0)))
       |> assign(:budgets_count, Keihi.budgets_count())
       |> assign(:balance, balance)
       |> assign(:remaining_balance, remaining_balance)
@@ -147,7 +141,7 @@ defmodule EkmiWeb.BudgetsLive do
     ~H"""
     <.link
       class="px-4 w-32 text-center"
-      navigate={
+      patch={
         ~p"/budgets?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"
       }
     >
@@ -271,4 +265,13 @@ defmodule EkmiWeb.BudgetsLive do
 
     {:ok, metadata, socket}
   end
+
+  defp select_budget(budgets, id) when id !== 0 do
+    Enum.filter(budgets, fn budget ->
+      budget.id == id
+    end)
+    |> hd()
+  end
+
+  defp select_budget(_budgets, _id), do: %{}
 end
