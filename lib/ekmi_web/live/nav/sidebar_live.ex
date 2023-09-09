@@ -7,7 +7,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
 
   @impl Phoenix.LiveComponent
   def mount(socket) do
-    {:ok, assign(socket, :show_cart, false)}
+    {:ok, socket}
   end
 
   @impl true
@@ -19,6 +19,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
         class="absolute -top-16 sm:-top-16 sm:-left-32 inline-flex items-center justify-center p-2 w-10 h-10 ml-3 text-sm rounded-lg focus:outline-none focus:ring-2 text-gray-400 hover:bg-gray-700 focus:ring-gray-600"
         aria-controls="navbar-hamburger"
         aria-expanded="false"
+        id="hamburger-btn"
       >
         <span class="sr-only">Open main menu</span>
         <SVGs.hamburger id="hamburger" />
@@ -26,13 +27,13 @@ defmodule EkmiWeb.Nav.SidebarLive do
 
       <div
         id="backdrop"
-        class={"backdrop-sepia-0 bg-white/50 h-full w-full fixed top-0 #{unless @show_cart, do: "hidden"}"}
+        class={"backdrop-sepia-0 bg-white/50 h-full w-full fixed top-0 hidden"}
         phx-click={toggle_sidebar()}
       />
 
       <div
         id="main-sidebar"
-        class={"z-10 h-full w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-800 #{unless @show_cart, do: "hidden"}"}
+        class={"z-10 h-full sm:w-[26.5rem] w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-800 hidden"}
       >
         <button
           phx-click={toggle_sidebar()}
@@ -119,6 +120,11 @@ defmodule EkmiWeb.Nav.SidebarLive do
     )
     |> JS.toggle(
       to: "#backdrop",
+      in: "fade-in",
+      out: "fade-out"
+    )
+    |> JS.toggle(
+      to: "#hamburger-btn",
       in: "fade-in",
       out: "fade-out"
     )
