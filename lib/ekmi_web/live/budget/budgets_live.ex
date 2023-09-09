@@ -59,7 +59,10 @@ defmodule EkmiWeb.BudgetsLive do
     }
 
     budgets = Keihi.list_budgets(current_user, options)
-    {total_count, total_budget_cost} = Keihi.get_budget_count_and_total(current_user, %{year: year, month: month})
+
+    {total_count, total_budget_cost} =
+      Keihi.get_budget_count_and_total(current_user, %{year: year, month: month})
+
     balance = Accounts.get_balance(current_user)
 
     remaining_balance = balance - total_budget_cost

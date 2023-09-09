@@ -16,7 +16,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
     <div class="relative">
       <button
         phx-click={toggle_sidebar()}
-        class="absolute -top-16 sm:-top-16 sm:-left-32 inline-flex items-center justify-center p-2 w-10 h-10 ml-3 text-sm rounded-lg focus:outline-none focus:ring-2 text-gray-400 hover:bg-gray-700 focus:ring-gray-600"
+        class="absolute -top-16 sm:-top-16 -left-[20px] inline-flex items-center justify-center p-2 w-10 h-10 ml-3 text-sm rounded-lg focus:outline-none focus:ring-2 text-gray-400 focus:ring-gray-600"
         aria-controls="navbar-hamburger"
         aria-expanded="false"
         id="hamburger-btn"
@@ -27,13 +27,13 @@ defmodule EkmiWeb.Nav.SidebarLive do
 
       <div
         id="backdrop"
-        class={"backdrop-sepia-0 bg-white/50 h-full w-full fixed top-0 hidden"}
+        class="backdrop-sepia-0 bg-white/50 h-full w-full fixed top-0 hidden"
         phx-click={toggle_sidebar()}
       />
 
       <div
         id="main-sidebar"
-        class={"z-10 h-full sm:w-[26.5rem] w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-800 hidden"}
+        class="z-10 h-full sm:w-[26.5rem] w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-800 hidden"
       >
         <button
           phx-click={toggle_sidebar()}

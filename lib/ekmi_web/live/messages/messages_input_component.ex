@@ -20,7 +20,7 @@ defmodule EkmiWeb.MessagesInputComponent do
             type="button"
             class="inline-flex justify-center p-2 rounded-lg cursor-pointer text-gray-400 hover:text-white hover:bg-gray-600"
           >
-            <SVGs.messagenger_upload id="messenger_upload" />
+            <SVGs.messenger_upload id="messenger_upload" />
 
             <span class="sr-only">Upload image</span>
           </button>
