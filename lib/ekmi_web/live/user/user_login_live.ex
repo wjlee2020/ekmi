@@ -6,13 +6,6 @@ defmodule EkmiWeb.UserLoginLive do
     <div class="mx-auto max-w-sm">
       <.header class="text-center">
         Sign in to account
-        <:subtitle>
-          Don't have an account?
-          <.link navigate={~p"/users/register"} class="font-semibold text-brand hover:underline">
-            Sign up
-          </.link>
-          for an account now.
-        </:subtitle>
       </.header>
 
       <.simple_form for={@form} id="login_form" action={~p"/users/log_in"} phx-update="ignore">

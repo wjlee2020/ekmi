@@ -52,7 +52,8 @@ defmodule EkmiWeb.Router do
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{EkmiWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      live "/users/register", UserRegistrationLive, :new
+      # Memo: I don't want anyone to be able to register, yet.
+      # live "/users/register", UserRegistrationLive, :new
       live "/users/log_in", UserLoginLive, :new
       live "/users/reset_password", UserForgotPasswordLive, :new
       live "/users/reset_password/:token", UserResetPasswordLive, :edit
