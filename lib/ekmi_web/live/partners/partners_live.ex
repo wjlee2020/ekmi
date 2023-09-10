@@ -51,7 +51,6 @@ defmodule EkmiWeb.PartnersLive do
         </div>
 
         <%= if @user do %>
-          <%!-- <Components.user_card user={@user} /> --%>
           <.live_component
             module={PartnerCardComponent}
             id={:partner_card}
@@ -71,9 +70,16 @@ defmodule EkmiWeb.PartnersLive do
   end
 
   def handle_info({:run_search, user_email}, socket) do
-    user = Accounts.get_user_by_email(user_email)
-    IO.inspect(user)
+    case Accounts.get_user_by_email(user_email) do
+      nil ->
+        socket =
+          socket
+          |> assign(:loading, false)
+          |> put_flash(:not_found, "User doesn't exist.")
 
-    {:noreply, assign(socket, loading: false, user: user)}
+        {:noreply, socket}
+
+      user -> {:noreply, assign(socket, loading: false, user: user)}
+    end
   end
 end
