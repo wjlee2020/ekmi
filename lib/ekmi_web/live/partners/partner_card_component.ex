@@ -23,20 +23,35 @@ defmodule EkmiWeb.PartnerCardComponent do
 
         <div class="flex space-x-3 mt-3">
           <%= if @user.partner_requested do %>
-          <button type="button" class="text-white bg-blue-500 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center" disabled>Partner Requested</button>
-
+            <%= if @user.requested_by == @current_user.email do %>
+              <button class="text-white bg-blue-500 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center" disabled>Partner Requested</button>
+            <% else %>
+              <button
+                class="text-white font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-600 hover:bg-blue-700"
+                phx-click="accept-request"
+              >
+                Accept Request
+              </button>
+            <% end %>
 
           <% else %>
-          <a
-            href="#"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700"
+          <button
+            class="text-white font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-600 hover:bg-blue-700"
+            value={@user.email}
+            phx-target={@myself}
+            phx-click="request"
           >
-            Add as Partner
-          </a>
+            Request Partner
+          </button>
           <% end %>
         </div>
       </div>
     </div>
     """
+  end
+
+  def handle_event("request", %{"value" => request_email}, socket) do
+    send(self(), {:run_request, request_email})
+    {:noreply, socket}
   end
 end

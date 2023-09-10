@@ -403,13 +403,15 @@ defmodule Ekmi.Accounts do
         c_user_request_changeset =
           User.requested_partner_changeset(current_user, %{
             partner_requested: true,
-            requested_email: partner_email
+            requested_email: partner_email,
+            requested_by: current_user.email
           })
 
         p_user_request_changeset =
           User.requested_partner_changeset(partner_user, %{
             partner_requested: true,
-            requested_email: current_user.email
+            requested_email: current_user.email,
+            requested_by: current_user.email
           })
 
         Multi.new()
@@ -436,14 +438,14 @@ defmodule Ekmi.Accounts do
       total_balance = user_one.finance.balance + user_two.finance.balance
 
       user_one_partner_change =
-        request_partner_change(user_one.partner_relation, %{
+        request_partner_change(%Partner{}, %{
           user_id: user_one.id,
           partner_id: user_two.id,
           balance: total_balance
         })
 
       user_two_partner_change =
-        request_partner_change(user_two.partner_relation, %{
+        request_partner_change(%Partner{}, %{
           user_id: user_two.id,
           partner_id: user_one.id,
           balance: total_balance

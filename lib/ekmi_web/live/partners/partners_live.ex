@@ -5,11 +5,18 @@ defmodule EkmiWeb.PartnersLive do
   alias EkmiWeb.{PartnerCardComponent, SVGs}
 
   def mount(_params, _session, socket) do
+    current_user = socket.assigns.current_user
+    partner = case current_user.requested_email do
+      "" -> nil
+      requested_email -> Accounts.get_user_by_email(requested_email)
+    end
+
     socket =
       socket
       |> assign(:loading, false)
       |> assign(:user_email, "")
-      |> assign(:user, nil)
+      |> assign(:user, partner)
+      |> assign(:current_user, current_user)
 
     {:ok, socket}
   end
@@ -55,6 +62,7 @@ defmodule EkmiWeb.PartnersLive do
             module={PartnerCardComponent}
             id={:partner_card}
             user={@user}
+            current_user={@current_user}
           />
         <% else %>
           <span :if={!@loading}>Search for a user</span>
@@ -69,6 +77,18 @@ defmodule EkmiWeb.PartnersLive do
     {:noreply, assign(socket, loading: true)}
   end
 
+  def handle_event("accept-request", _params, socket) do
+    %{current_user: current_user, user: user} = socket.assigns
+
+    case Accounts.set_partner(current_user, user) do
+      {:ok, _} ->
+        {:noreply, put_flash(socket, :info, "Successfully Accepted Request!")}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Couldn't accept request!")}
+    end
+  end
+
   def handle_info({:run_search, user_email}, socket) do
     case Accounts.get_user_by_email(user_email) do
       nil ->
@@ -80,6 +100,21 @@ defmodule EkmiWeb.PartnersLive do
         {:noreply, socket}
 
       user -> {:noreply, assign(socket, loading: false, user: user)}
+    end
+  end
+
+  def handle_info({:run_request, request_email}, socket) do
+     case Accounts.request_partner(%{current_user: socket.assigns.current_user, partner_email: request_email}) do
+      {:ok, %{update_requested_user: requested_user}} ->
+        socket =
+          socket
+          |> put_flash(:info, "Partner Requested!")
+          |> assign(:user, requested_user)
+
+        {:noreply, socket}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Unable to make this request!")}
     end
   end
 end
