@@ -1,8 +1,8 @@
 defmodule EkmiWeb.PartnersLive do
   use EkmiWeb, :live_view
 
-  alias EkmiWeb.SVGs
   alias Ekmi.Accounts
+  alias EkmiWeb.{PartnerCardComponent, SVGs}
 
   def mount(_params, _session, socket) do
     socket =
@@ -51,15 +51,14 @@ defmodule EkmiWeb.PartnersLive do
         </div>
 
         <%= if @user do %>
-          <span>
-            <%= @user.email %>
-          </span>
-
-          <span>
-            <%= @user.has_partner %>
-          </span>
+          <%!-- <Components.user_card user={@user} /> --%>
+          <.live_component
+            module={PartnerCardComponent}
+            id={:partner_card}
+            user={@user}
+          />
         <% else %>
-          <span>Search for a user</span>
+          <span :if={!@loading}>Search for a user</span>
         <% end %>
       </div>
     </div>
@@ -73,6 +72,7 @@ defmodule EkmiWeb.PartnersLive do
 
   def handle_info({:run_search, user_email}, socket) do
     user = Accounts.get_user_by_email(user_email)
+    IO.inspect(user)
 
     {:noreply, assign(socket, loading: false, user: user)}
   end

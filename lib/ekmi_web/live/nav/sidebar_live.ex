@@ -33,7 +33,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
 
       <div
         id="main-sidebar"
-        class="z-10 h-full sm:w-[26.5rem] w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-800 hidden"
+        class="z-10 h-full sm:w-80 w-64 py-8 px-4 fixed left-0 top-0 overflow-y-auto bg-gray-800 hidden"
       >
         <button
           phx-click={toggle_sidebar()}
@@ -47,11 +47,6 @@ defmodule EkmiWeb.Nav.SidebarLive do
         </button>
 
         <.link navigate={~p"/budgets"} class="flex items-center pl-2.5 mb-5">
-          <%!-- <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            class="h-6 mr-3 sm:h-7"
-            alt="Flowbite Logo"
-          /> --%>
           <span class="self-center text-xl font-semibold whitespace-nowrap text-white">
             Ekmi
           </span>
