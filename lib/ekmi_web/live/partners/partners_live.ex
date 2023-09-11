@@ -8,10 +8,12 @@ defmodule EkmiWeb.PartnersLive do
     if connected?(socket), do: Accounts.subscribe()
 
     current_user = socket.assigns.current_user
-    partner = case current_user.requested_email do
-      "" -> nil
-      requested_email -> Accounts.get_user_by_email(requested_email)
-    end
+
+    partner =
+      case current_user.requested_email do
+        "" -> nil
+        requested_email -> Accounts.get_user_by_email(requested_email)
+      end
 
     socket =
       socket
@@ -55,7 +57,10 @@ defmodule EkmiWeb.PartnersLive do
       </form>
 
       <div class="flex flex-col items-center justify-center mt-12">
-        <div :if={@loading} class="px-3 py-1 text-xs font-medium leading-none text-center text-blue-800 bg-blue-200 rounded-full animate-pulse dark:bg-blue-900 dark:text-blue-200">
+        <div
+          :if={@loading}
+          class="px-3 py-1 text-xs font-medium leading-none text-center text-blue-800 bg-blue-200 rounded-full animate-pulse dark:bg-blue-900 dark:text-blue-200"
+        >
           loading...
         </div>
 
@@ -101,12 +106,16 @@ defmodule EkmiWeb.PartnersLive do
 
         {:noreply, socket}
 
-      user -> {:noreply, assign(socket, loading: false, user: user)}
+      user ->
+        {:noreply, assign(socket, loading: false, user: user)}
     end
   end
 
   def handle_info({:run_request, request_email}, socket) do
-     case Accounts.request_partner(%{current_user: socket.assigns.current_user, partner_email: request_email}) do
+    case Accounts.request_partner(%{
+           current_user: socket.assigns.current_user,
+           partner_email: request_email
+         }) do
       {:ok, _} ->
         {:noreply, socket}
 
@@ -115,12 +124,39 @@ defmodule EkmiWeb.PartnersLive do
     end
   end
 
-  def handle_info({:partner_requested, %{update_requested_user: requested_user}}, socket) do
+  def handle_info(
+        {:partner_requested,
+         %{update_current_user: update_current_user, update_requested_user: update_requested_user}},
+        socket
+      ) do
+    current_user = socket.assigns.current_user
+
+    requested_user =
+      determine_requested_user(update_current_user, update_requested_user, current_user)
+
+    current_user =
+      determine_current_user(update_current_user, update_requested_user, current_user)
+
     socket =
       socket
       |> put_flash(:info, "Partner Requested!")
       |> assign(:user, requested_user)
+      |> assign(:current_user, current_user)
 
     {:noreply, socket}
   end
+
+  defp determine_requested_user(update_current, update_requested, current_user)
+       when update_current.email == current_user.email,
+       do: update_requested
+
+  defp determine_requested_user(update_current, _update_requested, _current_user),
+    do: update_current
+
+  defp determine_current_user(_update_current, update_requested, current_user)
+       when update_requested.email == current_user.email,
+       do: update_requested
+
+  defp determine_current_user(update_current, _update_requested, _current_user),
+    do: update_current
 end

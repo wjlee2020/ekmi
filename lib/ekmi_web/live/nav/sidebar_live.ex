@@ -13,7 +13,8 @@ defmodule EkmiWeb.Nav.SidebarLive do
   @impl true
   def render(assigns) do
     partner_notification =
-      case assigns.current_user && assigns.current_user.partner_requested && !assigns.current_user.has_partner do
+      case assigns.current_user && assigns.current_user.partner_requested &&
+             !assigns.current_user.has_partner do
         true -> 1
         nil -> nil
         false -> nil
