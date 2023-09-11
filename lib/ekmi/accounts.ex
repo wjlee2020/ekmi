@@ -10,9 +10,26 @@ defmodule Ekmi.Accounts do
   alias Ekmi.Repo
   alias Ekmi.Workers.FinanceWorker
 
+  @topic inspect(__MODULE__)
+  @pubsub Ekmi.PubSub
+
   @type ecto_changeset :: Ecto.Changeset.t()
   @type finance :: %Finance{}
   @user_not_found "Failed to find user. Please try again."
+
+  def subscribe do
+    Phoenix.PubSub.subscribe(@pubsub, @topic)
+  end
+
+  def broadcast({:ok, multi}, tag) do
+    Phoenix.PubSub.broadcast(
+      @pubsub,
+      @topic,
+      {tag, multi}
+    )
+
+    {:ok, multi}
+  end
 
   ## Database getters
 
@@ -418,6 +435,7 @@ defmodule Ekmi.Accounts do
         |> Multi.update(:update_current_user, c_user_request_changeset)
         |> Multi.update(:update_requested_user, p_user_request_changeset)
         |> Repo.transaction()
+        |> broadcast(:partner_requested)
     end
   end
 

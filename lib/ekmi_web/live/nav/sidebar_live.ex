@@ -12,6 +12,17 @@ defmodule EkmiWeb.Nav.SidebarLive do
 
   @impl true
   def render(assigns) do
+    partner_notification =
+      case assigns.current_user && assigns.current_user.partner_requested && !assigns.current_user.has_partner do
+        true -> 1
+        nil -> nil
+        false -> nil
+      end
+
+    assigns =
+      assigns
+      |> assign(:partner_notification, partner_notification)
+
     ~H"""
     <div class="relative">
       <button
@@ -66,10 +77,16 @@ defmodule EkmiWeb.Nav.SidebarLive do
           <li>
             <.link
               navigate={~p"/partners"}
-              class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
+              class="relative flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
             >
               <SVGs.people id="people" />
               <span class="flex-1 ml-3 whitespace-nowrap">Partners</span>
+              <%= if @partner_notification do %>
+                <span class="sr-only">Notifications</span>
+                <div class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -left-2 dark:border-gray-900">
+                  <%= @partner_notification %>
+                </div>
+              <% end %>
             </.link>
           </li>
 
@@ -123,5 +140,11 @@ defmodule EkmiWeb.Nav.SidebarLive do
       in: "fade-in",
       out: "fade-out"
     )
+  end
+
+  def handle_info({:partner_requested, multi}, socket) do
+    IO.puts("HELLLLO WORLDD")
+    IO.inspect(multi)
+    {:noreply, socket}
   end
 end

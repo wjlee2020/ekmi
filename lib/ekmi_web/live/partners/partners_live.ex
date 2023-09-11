@@ -5,6 +5,8 @@ defmodule EkmiWeb.PartnersLive do
   alias EkmiWeb.{PartnerCardComponent, SVGs}
 
   def mount(_params, _session, socket) do
+    if connected?(socket), do: Accounts.subscribe()
+
     current_user = socket.assigns.current_user
     partner = case current_user.requested_email do
       "" -> nil
@@ -105,16 +107,20 @@ defmodule EkmiWeb.PartnersLive do
 
   def handle_info({:run_request, request_email}, socket) do
      case Accounts.request_partner(%{current_user: socket.assigns.current_user, partner_email: request_email}) do
-      {:ok, %{update_requested_user: requested_user}} ->
-        socket =
-          socket
-          |> put_flash(:info, "Partner Requested!")
-          |> assign(:user, requested_user)
-
+      {:ok, _} ->
         {:noreply, socket}
 
       {:error, _} ->
         {:noreply, put_flash(socket, :error, "Unable to make this request!")}
     end
+  end
+
+  def handle_info({:partner_requested, %{update_requested_user: requested_user}}, socket) do
+    socket =
+      socket
+      |> put_flash(:info, "Partner Requested!")
+      |> assign(:user, requested_user)
+
+    {:noreply, socket}
   end
 end
