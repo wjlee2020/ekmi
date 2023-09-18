@@ -146,6 +146,19 @@ defmodule EkmiWeb.PartnersLive do
     {:noreply, socket}
   end
 
+  def handle_info({:partner_accepted, %{update_user_one: update_user_one, update_user_two: update_user_two}}, socket) do
+    current_user = socket.assigns.current_user
+    requested_user = determine_requested_user(update_user_one, update_user_two, current_user )
+    current_user = determine_current_user(update_user_one, update_user_two, current_user)
+
+    socket =
+      socket
+      |> put_flash(:info, "Partner Requested!")
+      |> assign(:user, requested_user)
+      |> assign(:current_user, current_user)
+    {:noreply, socket}
+  end
+
   defp determine_requested_user(update_current, update_requested, current_user)
        when update_current.email == current_user.email,
        do: update_requested

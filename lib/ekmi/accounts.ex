@@ -479,6 +479,7 @@ defmodule Ekmi.Accounts do
         User.update_partner_changeset(user_two, %{has_partner: true})
       end)
       |> Repo.transaction()
+      |> broadcast(:partner_accepted)
     end
   end
 
