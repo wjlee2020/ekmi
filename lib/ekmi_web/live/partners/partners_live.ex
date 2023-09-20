@@ -148,7 +148,7 @@ defmodule EkmiWeb.PartnersLive do
 
   def handle_info({:partner_accepted, %{update_user_one: update_user_one, update_user_two: update_user_two}}, socket) do
     current_user = socket.assigns.current_user
-    requested_user = determine_requested_user(update_user_one, update_user_two, current_user )
+    requested_user = determine_requested_user(update_user_one, update_user_two, current_user)
     current_user = determine_current_user(update_user_one, update_user_two, current_user)
 
     socket =
