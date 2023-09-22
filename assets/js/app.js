@@ -23,6 +23,7 @@ import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 import BudgetChart from "./chart/budget_chart";
 import ScrollDown from "./scroll";
+import Uploaders from "./uploaders";
 
 let Hooks = {};
 Hooks.BudgetChart = BudgetChart;
@@ -31,7 +32,9 @@ Hooks.ScrollDown = ScrollDown;
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
+
 let liveSocket = new LiveSocket("/live", Socket, {
+  uploaders: Uploaders,
   params: { _csrf_token: csrfToken },
   hooks: Hooks,
 });

@@ -6,13 +6,13 @@ defmodule EkmiWeb.BudgetsLive do
 
   use EkmiWeb, :live_view
 
-  @s3_bucket "ekmi-uploads"
-  @s3_url "//#{@s3_bucket}.s3.amazonaws.com"
-  @s3_region "ap-northeast-1"
-
   alias Ekmi.{Accounts, Repo}
   alias Ekmi.Keihi
   alias EkmiWeb.{Budgets, BudgetsChartComponent, BudgetsFormComponent}
+
+  @s3_bucket "ekmi-uploads"
+  @s3_url "//#{@s3_bucket}.s3.amazonaws.com"
+  @s3_region "ap-northeast-1"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -254,7 +254,7 @@ defmodule EkmiWeb.BudgetsLive do
       SimpleS3Upload.sign_form_upload(config, "my-bucket",
         key: "public/my-file-name",
         content_type: "image/png",
-        max_file_size: 10_000,
+        max_file_size: socket.assigns.uploads.photos.max_file_size,
         expires_in: :timer.hours(1)
       )
 
