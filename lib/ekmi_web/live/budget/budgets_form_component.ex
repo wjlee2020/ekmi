@@ -181,6 +181,24 @@ defmodule EkmiWeb.BudgetsFormComponent do
 
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
             <div
+              :for={{img_location, index} <- Enum.with_index(@selected_budget.receipt_img)}
+              class="relative"
+            >
+              <img class="h-64 max-w-full rounded-lg object-cover" src={img_location} />
+
+              <a
+                class="absolute -top-4 -right-2 text-2xl font-bold cursor-pointer hover:text-red-400"
+                phx-click="remove_img"
+                phx-value-ref={index}
+                phx-target={@myself}
+              >
+                &times;
+              </a>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <div
               :for={entry <- @uploads.receipt_img.entries}
               class="flex flex-col sm:flex-row items-center gap-3"
             >
@@ -207,22 +225,6 @@ defmodule EkmiWeb.BudgetsFormComponent do
                 class="cursor-pointer"
                 phx-click="cancel"
                 phx-value-ref={entry.ref}
-                phx-target={@myself}
-              >
-                &times;
-              </a>
-            </div>
-
-            <div
-              :for={{img_location, index} <- Enum.with_index(@selected_budget.receipt_img)}
-              class="relative"
-            >
-              <img class="h-64 max-w-full rounded-lg object-cover" src={img_location} />
-
-              <a
-                class="absolute -top-4 -right-2 text-2xl font-bold cursor-pointer hover:text-red-400"
-                phx-click="remove_img"
-                phx-value-ref={index}
                 phx-target={@myself}
               >
                 &times;
@@ -278,22 +280,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
 
   @impl true
   def handle_event("save", %{"budget" => budget}, socket) do
-    receipt_img =
-      consume_uploaded_entries(socket, :receipt_img, fn meta, entry ->
-        dest =
-          Path.join([
-            "priv",
-            "static",
-            "uploads",
-            "#{entry.uuid}-#{entry.client_name}"
-          ])
-
-        File.cp!(meta.path, dest)
-
-        url_path = static_path(socket, "/uploads/#{Path.basename(dest)}")
-
-        {:ok, url_path}
-      end)
+    receipt_img = consume_receipt_img(socket)
 
     budget = Map.put(budget, "receipt_img", receipt_img)
 
@@ -331,22 +318,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
   def handle_event("update", %{"budget" => budget}, socket) do
     original_budget = Repo.get(Budget, budget["id"])
 
-    receipt_img =
-      consume_uploaded_entries(socket, :receipt_img, fn meta, entry ->
-        dest =
-          Path.join([
-            "priv",
-            "static",
-            "uploads",
-            "#{entry.uuid}-#{entry.client_name}"
-          ])
-
-        File.cp!(meta.path, dest)
-
-        url_path = static_path(socket, "/uploads/#{Path.basename(dest)}")
-
-        {:ok, url_path}
-      end)
+    receipt_img = consume_receipt_img(socket)
 
     struct_map = Map.from_struct(socket.assigns.selected_budget)
 
@@ -420,5 +392,23 @@ defmodule EkmiWeb.BudgetsFormComponent do
            user_id: budget["user_id"]
        }
      )}
+  end
+
+  defp consume_receipt_img(socket) do
+    consume_uploaded_entries(socket, :receipt_img, fn meta, entry ->
+      dest =
+        Path.join([
+          "priv",
+          "static",
+          "uploads",
+          "#{entry.uuid}-#{entry.client_name}"
+        ])
+
+      File.cp!(meta.path, dest)
+
+      url_path = static_path(socket, "/uploads/#{Path.basename(dest)}")
+
+      {:ok, url_path}
+    end)
   end
 end
