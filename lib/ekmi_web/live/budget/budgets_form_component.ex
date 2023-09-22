@@ -1,7 +1,7 @@
 defmodule EkmiWeb.BudgetsFormComponent do
   use EkmiWeb, :live_component
 
-  alias Ekmi.Keihi
+  alias Ekmi.{Keihi, Repo}
   alias Ekmi.Keihi.Budget
   alias EkmiWeb.SVGs
 
@@ -21,7 +21,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
         <.form
           for={@budget_form}
           class="flex flex-col gap-2 mt-2"
-          phx-change="validate"
+          phx-change="validate_new"
           phx-submit="save"
           phx-target={@myself}
         >
@@ -167,7 +167,52 @@ defmodule EkmiWeb.BudgetsFormComponent do
             autocomplete="off"
           />
 
+          <div class="mt-3 text-sm font-medium text-gray-500">
+            Add up to <%= @uploads.receipt_img.max_entries %> photos
+
+            (max <%= trunc(@uploads.receipt_img.max_file_size / 1_000_000) %> MB each)
+          </div>
+
+          <.receipt_img_uploader uploads={@uploads} />
+
+          <.error :for={err <- upload_errors(@uploads.receipt_img)}>
+            <%= Phoenix.Naming.humanize(err) %>
+          </.error>
+
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+            <div
+              :for={entry <- @uploads.receipt_img.entries}
+              class="flex flex-col sm:flex-row items-center gap-3"
+            >
+              <.live_img_preview entry={entry} class="min-w-[16rem] h-64 rounded-lg object-cover" />
+
+              <div class="w-full flex flex-col">
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm font-medium text-blue-700">
+                    <%= entry.progress %>%
+                  </span>
+                </div>
+
+                <div class="w-full rounded-full h-2.5 bg-gray-700">
+                  <div class="bg-blue-600 h-2.5 rounded-full" style={"width: #{entry.progress}%"}>
+                  </div>
+                </div>
+
+                <.error :for={err <- upload_errors(@uploads.receipt_img, entry)}>
+                  <%= Phoenix.Naming.humanize(err) %>
+                </.error>
+              </div>
+
+              <a
+                class="cursor-pointer"
+                phx-click="cancel"
+                phx-value-ref={entry.ref}
+                phx-target={@myself}
+              >
+                &times;
+              </a>
+            </div>
+
             <div
               :for={{img_location, index} <- Enum.with_index(@selected_budget.receipt_img)}
               class="relative"
@@ -284,7 +329,45 @@ defmodule EkmiWeb.BudgetsFormComponent do
   end
 
   def handle_event("update", %{"budget" => budget}, socket) do
-    case Keihi.update_budget(socket.assigns.selected_budget, budget) do
+    original_budget = Repo.get(Budget, budget["id"])
+
+    receipt_img =
+      consume_uploaded_entries(socket, :receipt_img, fn meta, entry ->
+        dest =
+          Path.join([
+            "priv",
+            "static",
+            "uploads",
+            "#{entry.uuid}-#{entry.client_name}"
+          ])
+
+        File.cp!(meta.path, dest)
+
+        url_path = static_path(socket, "/uploads/#{Path.basename(dest)}")
+
+        {:ok, url_path}
+      end)
+
+    struct_map = Map.from_struct(socket.assigns.selected_budget)
+
+    string_key_struct_map =
+      struct_map
+      |> Enum.map(fn {k, v} -> {to_string(k), v} end)
+      |> Enum.into(%{})
+
+    string_key_struct_map = %{
+      string_key_struct_map
+      | "cost" => budget["cost"],
+        "category_id" => "6",
+        "created_at" => budget["created_at"],
+        "description" => budget["description"],
+        "id" => budget["id"],
+        "title" => budget["title"],
+        "user_id" => budget["user_id"],
+        "receipt_img" => socket.assigns.selected_budget.receipt_img ++ receipt_img
+    }
+
+    case Keihi.update_budget(original_budget, string_key_struct_map) do
       {:ok, _budget} ->
         {:noreply, socket}
 
@@ -308,7 +391,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
     {:noreply, socket}
   end
 
-  def handle_event("validate", %{"budget" => budget}, socket) do
+  def handle_event("validate_new", %{"budget" => budget}, socket) do
     budget_form =
       %Budget{}
       |> Keihi.change_budget(budget)
@@ -316,5 +399,26 @@ defmodule EkmiWeb.BudgetsFormComponent do
       |> to_form()
 
     {:noreply, assign(socket, budget_form: budget_form)}
+  end
+
+  def handle_event("validate", %{"budget" => budget}, socket) do
+    budget_form =
+      socket.assigns.selected_budget
+      |> Keihi.change_budget(budget)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply,
+     assign(socket,
+       budget_form: budget_form,
+       selected_budget: %Budget{
+         socket.assigns.selected_budget
+         | cost: budget["cost"],
+           category_id: budget["category_id"],
+           description: budget["description"],
+           title: budget["title"],
+           user_id: budget["user_id"]
+       }
+     )}
   end
 end
