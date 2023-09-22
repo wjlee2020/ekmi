@@ -3,14 +3,6 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import { chartConfig } from "../helpers";
 
 Chart.register(ChartDataLabels);
-const backgroundColor = [
-  "#4287F5",
-  "#F7630C",
-  "#28B463",
-  "#FFCE56",
-  "#9966FF",
-  "#FF6666",
-];
 
 export default {
   mounted() {

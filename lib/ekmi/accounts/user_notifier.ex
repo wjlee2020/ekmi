@@ -8,7 +8,7 @@ defmodule Ekmi.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Ekmi", "contact@example.com"})
+      |> from({"Ekmi", "wjles.sumita@gmail.com"})
       |> subject(subject)
       |> text_body(body)
 
