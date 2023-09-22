@@ -92,7 +92,7 @@ defmodule Ekmi.Keihi do
   @spec update_budget(budget, map()) :: {:ok, budget} | {:error, ecto_changeset}
   def update_budget(selected_budget, attrs \\ %{}) do
     selected_budget
-    |> change_budget(attrs)
+    |> update_change_budget(attrs)
     |> Repo.update()
     |> broadcast(:budget_updated)
   end
@@ -166,6 +166,11 @@ defmodule Ekmi.Keihi do
   @spec change_budget(budget, map()) :: ecto_changeset()
   def change_budget(%Budget{} = budget, attr \\ %{}) do
     Budget.changeset(budget, attr)
+  end
+
+  @spec update_change_budget(budget, map()) :: ecto_changeset()
+  def update_change_budget(%Budget{} = budget, attr \\ %{}) do
+    Budget.update_changeset(budget, attr)
   end
 
   @spec budgets_count() :: integer()

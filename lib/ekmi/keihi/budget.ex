@@ -40,11 +40,10 @@ defmodule Ekmi.Keihi.Budget do
         :description,
         :cost,
         :category_id,
-        :user_id,
         :created_at,
         :receipt_img
       ])
-      |> validate_required([:title, :description, :cost, :category_id, :user_id, :created_at])
+      |> validate_required([:title, :description, :cost, :category_id, :created_at])
       |> assoc_constraint(:user)
       |> foreign_key_constraint(:category_id)
 
