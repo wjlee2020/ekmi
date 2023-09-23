@@ -38,9 +38,9 @@ if config_env() == :prod do
 
   config :ekmi, Ekmi.Mailer,
     adapter: Swoosh.Adapters.AmazonSES,
-    region: System.fetch_env!("AWS_REGION"),
-    access_key: System.fetch_env!("AWS_ACCESS_KEY_ID"),
-    secret: System.fetch_env!("AWS_SECRET_ACCESS_KEY")
+    region: System.get_env("AWS_REGION"),
+    access_key: System.get_env("AWS_ACCESS_KEY_ID"),
+    secret: System.get_env("AWS_SECRET_ACCESS_KEY")
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you

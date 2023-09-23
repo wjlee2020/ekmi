@@ -330,7 +330,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
     string_key_struct_map = %{
       string_key_struct_map
       | "cost" => budget["cost"],
-        "category_id" => "6",
+        "category_id" => budget["category_id"],
         "created_at" => budget["created_at"],
         "description" => budget["description"],
         "id" => budget["id"],

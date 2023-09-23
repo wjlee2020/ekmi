@@ -12,6 +12,7 @@ defmodule EkmiWeb.PartnersLive do
     partner =
       case current_user.requested_email do
         "" -> nil
+        nil -> nil
         requested_email -> Accounts.get_user_by_email(requested_email)
       end
 
@@ -146,7 +147,11 @@ defmodule EkmiWeb.PartnersLive do
     {:noreply, socket}
   end
 
-  def handle_info({:partner_accepted, %{update_user_one: update_user_one, update_user_two: update_user_two}}, socket) do
+  def handle_info(
+        {:partner_accepted,
+         %{update_user_one: update_user_one, update_user_two: update_user_two}},
+        socket
+      ) do
     current_user = socket.assigns.current_user
     requested_user = determine_requested_user(update_user_one, update_user_two, current_user)
     current_user = determine_current_user(update_user_one, update_user_two, current_user)
@@ -156,6 +161,7 @@ defmodule EkmiWeb.PartnersLive do
       |> put_flash(:info, "Partner Requested!")
       |> assign(:user, requested_user)
       |> assign(:current_user, current_user)
+
     {:noreply, socket}
   end
 

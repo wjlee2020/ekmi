@@ -24,13 +24,10 @@ defmodule EkmiWeb.MessagesLive do
 
     presences = simple_presence_map(Presence.list(@topic))
 
-    changset = Chat.change_message(%Message{})
-    messages = Chat.list_messages()
-
     socket =
       socket
-      |> stream(:messages, messages)
-      |> assign(:message_form, to_form(changset))
+      |> stream(:messages, Chat.list_messages())
+      |> assign(:message_form, to_form(Chat.change_message(%Message{})))
       |> assign(:sender_id, current_user.id)
       |> assign(:receiver_id, nil)
       |> assign(:presences, presences)
@@ -42,7 +39,7 @@ defmodule EkmiWeb.MessagesLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="grid grid-cols-3">
+    <div class="grid sm:grid-cols-3 text-xs sm:text-lg gap-4 lg:gap-0">
       <ul>
         Online
         <li :for={{_user_id, meta} <- @presences} class="mt-3">
@@ -55,7 +52,7 @@ defmodule EkmiWeb.MessagesLive do
         </li>
       </ul>
 
-      <div class="h-[80vh] grid col-span-2 p-6 border rounded-lg shadow bg-gray-800 border-gray-700">
+      <div class="h-[80vh] grid col-span-2 p-2 border rounded-lg shadow bg-gray-800 border-gray-700">
         <div
           id="messages"
           phx-update="stream"
@@ -70,7 +67,7 @@ defmodule EkmiWeb.MessagesLive do
             style={"align-self: #{message_align(%{sender_email: message.sender.email, current_user_email: assigns.current_user.email})}"}
           >
             <div
-              class="flex flex-col p-4 rounded-lg"
+              class="flex flex-col p-2 rounded-lg"
               style={"background-color: #{message_style(%{sender_email: message.sender.email, current_user_email: assigns.current_user.email})}"}
             >
               <span>
