@@ -169,14 +169,20 @@ defmodule EkmiWeb.MessagesLive do
   defp add_presences(socket, joins) do
     presences = Map.merge(socket.assigns.presences, simple_presence_map(joins))
 
-    socket =
-      Map.filter(presences, fn {key, _v} ->
-        key !== Integer.to_string(socket.assigns.current_user.id)
-      end)
-      |> Map.keys()
-      |> add_receiver(socket)
+    case socket.assigns.current_user.has_partner do
+      true ->
+        socket =
+          Map.filter(presences, fn {key, _v} ->
+            key !== Integer.to_string(socket.assigns.current_user.id)
+          end)
+          |> Map.keys()
+          |> add_receiver(socket)
 
-    assign(socket, :presences, presences)
+        assign(socket, :presences, presences)
+
+      false ->
+        assign(socket, :presences, presences)
+    end
   end
 
   defp add_receiver(_keys = [], socket), do: socket

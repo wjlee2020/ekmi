@@ -33,12 +33,14 @@ defmodule EkmiWeb.MessagesInputComponent do
             placeholder="Send a message"
             autocomplete="off"
             style="min-height: auto; width: 95%; margin: 12px auto;"
+            disabled={!@receiver_id}
           />
 
           <.input type="hidden" field={@message_form[:sender_id]} value={@sender_id} />
           <.input type="hidden" field={@message_form[:receiver_id]} value={@receiver_id} />
 
           <button
+            disabled={!@receiver_id}
             type="submit"
             class="inline-flex justify-center p-2 rounded-full cursor-pointer text-blue-500 hover:bg-gray-600"
           >
