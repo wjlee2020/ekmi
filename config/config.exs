@@ -60,6 +60,7 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :ekmi, Oban,
+  notifier: Oban.Notifiers.PG,
   repo: Ekmi.Repo,
   plugins: [Oban.Plugins.Pruner],
   queues: [default: 10]
