@@ -113,6 +113,7 @@ defmodule EkmiWeb.BudgetsLive do
   @impl true
   def handle_info({:budget_updated, budget}, socket) do
     budget = budget |> Repo.preload(:category)
+    socket = update_remaining_balance(socket.assigns.selected_budget.cost, budget.cost, socket)
 
     socket =
       socket
@@ -276,4 +277,18 @@ defmodule EkmiWeb.BudgetsLive do
   end
 
   defp select_budget(_budgets, _id), do: %{}
+
+  defp update_remaining_balance(initial_budget_cost, updated_budget_cost, socket)
+       when initial_budget_cost > updated_budget_cost do
+    difference = abs(initial_budget_cost - updated_budget_cost)
+    assign(socket, :remaining_balance, socket.assigns.remaining_balance + difference)
+  end
+
+  defp update_remaining_balance(initial_budget_cost, updated_budget_cost, socket)
+       when initial_budget_cost < updated_budget_cost do
+    difference = abs(initial_budget_cost - updated_budget_cost)
+    assign(socket, :remaining_balance, socket.assigns.remaining_balance - difference)
+  end
+
+  defp update_remaining_balance(_, _, socket), do: socket
 end
