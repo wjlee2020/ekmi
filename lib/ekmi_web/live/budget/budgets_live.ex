@@ -278,17 +278,25 @@ defmodule EkmiWeb.BudgetsLive do
 
   defp select_budget(_budgets, _id), do: %{}
 
-  defp update_remaining_balance(initial_budget_cost, updated_budget_cost, socket)
-       when initial_budget_cost > updated_budget_cost do
-    difference = abs(initial_budget_cost - updated_budget_cost)
-    assign(socket, :remaining_balance, socket.assigns.remaining_balance + difference)
-  end
+  defp update_remaining_balance(initial, updated, socket) when initial !== updated do
+    remaining_balance =
+      case updated - initial do
+        diff when diff > 0 -> socket.assigns.remaining_balance - diff
+        diff when diff < 0 -> socket.assigns.remaining_balance + abs(diff)
+      end
 
-  defp update_remaining_balance(initial_budget_cost, updated_budget_cost, socket)
-       when initial_budget_cost < updated_budget_cost do
-    difference = abs(initial_budget_cost - updated_budget_cost)
-    assign(socket, :remaining_balance, socket.assigns.remaining_balance - difference)
+    update_bal_related(
+      remaining_balance,
+      remaining_balance / socket.assigns.balance * 100,
+      socket
+    )
   end
 
   defp update_remaining_balance(_, _, socket), do: socket
+
+  defp update_bal_related(remaining_balance, bal_percentage, socket) do
+    socket
+    |> assign(:remaining_balance, remaining_balance)
+    |> assign(:bal_percentage, bal_percentage)
+  end
 end

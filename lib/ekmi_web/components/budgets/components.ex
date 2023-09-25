@@ -61,6 +61,7 @@ defmodule EkmiWeb.Budgets.Components do
   attr :remaining_balance, :integer, required: true
 
   def monthly_balance(assigns) do
+    {:ok, current_spending} = Cldr.Number.to_string(assigns.balance - assigns.remaining_balance)
     {:ok, balance} = Cldr.Number.to_string(assigns.balance)
     {:ok, remaining_balance} = Cldr.Number.to_string(assigns.remaining_balance)
 
@@ -68,15 +69,20 @@ defmodule EkmiWeb.Budgets.Components do
       assigns
       |> assign(:remaining_balance, remaining_balance)
       |> assign(:balance, balance)
+      |> assign(:current_spending, current_spending)
 
     ~H"""
-    <div class="flex gap-4">
+    <div class="flex flex-col sm:flex-row sm:gap-4">
       <span>
         Remaining Balance: <%= @remaining_balance %> 円
       </span>
 
       <span>
         Total Balance: <%= @balance %> 円
+      </span>
+
+      <span>
+        Spent: <%= @current_spending %> 円
       </span>
     </div>
     """
