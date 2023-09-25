@@ -54,7 +54,8 @@ defmodule Ekmi.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:ex_cldr, "~> 2.37"},
       {:ex_cldr_numbers, "~> 2.31"},
-      {:oban, "~> 2.14"}
+      {:oban, "~> 2.14"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
