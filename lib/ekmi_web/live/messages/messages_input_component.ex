@@ -1,4 +1,6 @@
 defmodule EkmiWeb.MessagesInputComponent do
+  @moduledoc false
+
   use EkmiWeb, :live_component
 
   alias EkmiWeb.SVGs

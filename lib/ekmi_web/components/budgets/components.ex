@@ -1,4 +1,8 @@
 defmodule EkmiWeb.Budgets.Components do
+  @moduledoc """
+  Function components for Budgets
+  """
+
   use EkmiWeb, :html
 
   alias Ekmi.Cldr

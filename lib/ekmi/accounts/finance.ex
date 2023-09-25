@@ -1,4 +1,6 @@
 defmodule Ekmi.Accounts.Finance do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
 

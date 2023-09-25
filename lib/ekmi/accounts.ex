@@ -449,6 +449,7 @@ defmodule Ekmi.Accounts do
   ## Returns
       - {:ok, Multi} - on success.
       - {:error, Multi.name} - should the transaction rollback.
+      - {:error, String.t()} - should `partner_requested` on the given user be false.
   """
   def set_partner(current_user, partner_user) do
     with {:ok, user_one} <- is_requested_partner(current_user),
@@ -480,6 +481,8 @@ defmodule Ekmi.Accounts do
       end)
       |> Repo.transaction()
       |> broadcast(:partner_accepted)
+    else
+      {:error, msg} -> {:error, msg}
     end
   end
 
@@ -592,7 +595,7 @@ defmodule Ekmi.Accounts do
           - if user has a partner, it returns the partner_relation finance balance
 
   """
-  @spec get_balance(%User{}) :: integer()
+  @spec get_balance(User.t()) :: integer()
   def get_balance(%User{} = user) do
     case user.has_partner do
       true ->
@@ -631,11 +634,13 @@ defmodule Ekmi.Accounts do
   end
 
   defp is_requested_partner(%{partner_requested: partner_requested} = user) do
-    with true <- partner_requested do
-      user = Repo.preload(user, [:finance, :partner_relation])
-      {:ok, user}
-    else
-      false -> IO.inspect(user, label: "PARTNER REQUESTED")
+    case partner_requested do
+      true ->
+        user = Repo.preload(user, [:finance, :partner_relation])
+        {:ok, user}
+
+      false ->
+        {:error, "#{user.email} has no partner reqeusted"}
     end
   end
 end

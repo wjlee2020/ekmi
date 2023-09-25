@@ -1,4 +1,6 @@
 defmodule EkmiWeb.PartnerCardComponent do
+  @moduledoc false
+
   use EkmiWeb, :live_component
 
   def mount(socket) do

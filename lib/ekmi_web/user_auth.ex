@@ -1,4 +1,6 @@
 defmodule EkmiWeb.UserAuth do
+  @moduledoc false
+
   use EkmiWeb, :verified_routes
 
   import Plug.Conn

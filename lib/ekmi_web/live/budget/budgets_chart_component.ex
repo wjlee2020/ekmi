@@ -1,4 +1,6 @@
 defmodule EkmiWeb.BudgetsChartComponent do
+  @moduledoc false
+
   use EkmiWeb, :live_component
 
   @impl Phoenix.LiveComponent

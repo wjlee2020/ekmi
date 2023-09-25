@@ -142,10 +142,4 @@ defmodule EkmiWeb.Nav.SidebarLive do
       out: "fade-out"
     )
   end
-
-  def handle_info({:partner_requested, multi}, socket) do
-    IO.puts("HELLLLO WORLDD")
-    IO.inspect(multi)
-    {:noreply, socket}
-  end
 end

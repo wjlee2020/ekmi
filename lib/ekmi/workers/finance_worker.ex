@@ -1,4 +1,6 @@
 defmodule Ekmi.Workers.FinanceWorker do
+  @moduledoc false
+
   use Oban.Worker, queue: :default
 
   alias Ekmi.Accounts

@@ -1,4 +1,6 @@
 defmodule Ekmi.Keihi.Category do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
 

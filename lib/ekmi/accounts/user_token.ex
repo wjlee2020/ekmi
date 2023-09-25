@@ -1,4 +1,6 @@
 defmodule Ekmi.Accounts.UserToken do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Query
   alias Ekmi.Accounts.UserToken

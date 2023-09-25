@@ -185,22 +185,22 @@ defmodule EkmiWeb.MessagesLive do
     end
   end
 
-  defp add_receiver(_keys = [], socket), do: socket
+  defp add_receiver([] = _keys, socket), do: socket
 
   defp add_receiver(keys, socket),
     do: assign(socket, :receiver_id, keys |> hd() |> String.to_integer())
 
   defp message_align(%{sender_email: sender_email, current_user_email: current_user_email}) do
-    cond do
-      sender_email == current_user_email -> "end"
-      true -> "start"
+    case sender_email == current_user_email do
+      true -> "end"
+      false -> "start"
     end
   end
 
   defp message_style(%{sender_email: sender_email, current_user_email: current_user_email}) do
-    cond do
-      sender_email == current_user_email -> "white"
-      true -> "#8DA2FB"
+    case sender_email == current_user_email do
+      true -> "white"
+      false -> "#8DA2FB"
     end
   end
 end

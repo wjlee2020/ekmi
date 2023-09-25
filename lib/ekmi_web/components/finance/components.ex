@@ -1,4 +1,8 @@
 defmodule EkmiWeb.Finance.Components do
+  @moduledoc """
+  Function components for Finance
+  """
+
   use EkmiWeb, :html
 
   def finance_form(assigns) do

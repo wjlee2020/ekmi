@@ -119,8 +119,8 @@ defmodule Ekmi.Keihi do
       iex> Ekmi.Keihi.list_budgets(%User{id: 1})
       [%Ekmi.Keihi.Budget{}]
   """
-  @spec list_budgets(%User{}, map()) :: [budget]
-  def list_budgets(user = %User{}, options) when is_map(options) do
+  @spec list_budgets(User.t(), map()) :: [budget]
+  def list_budgets(%User{} = user, options) when is_map(options) do
     Queries.where_user(user)
     |> Queries.sort(options)
     |> Queries.paginate(options)
@@ -128,8 +128,8 @@ defmodule Ekmi.Keihi do
     |> Repo.all()
   end
 
-  @spec list_budgets(%User{}) :: [budget]
-  def list_budgets(user = %User{}) do
+  @spec list_budgets(User.t()) :: [budget]
+  def list_budgets(%User{} = user) do
     Queries.where_user(user)
     |> Repo.all()
   end
@@ -191,8 +191,8 @@ defmodule Ekmi.Keihi do
       iex> Ekmi.Keihi.get_budget_count_and_total(%User{id: 1})
       {3, 5000}
   """
-  @spec get_budget_count_and_total(%User{}) :: {integer(), integer()}
-  def get_budget_count_and_total(user = %User{}) do
+  @spec get_budget_count_and_total(User.t()) :: {integer(), integer()}
+  def get_budget_count_and_total(%User{} = user) do
     list_budgets(user)
     |> Enum.reduce({0, 0}, fn budget, {count, total} ->
       {count + 1, total + budget.cost}
@@ -213,8 +213,8 @@ defmodule Ekmi.Keihi do
       iex> Ekmi.Keihi.get_budget_count_and_total(%User{user: 1}, %{sort: :desc, page: 2})
       {3, 5000}
   """
-  @spec get_budget_count_and_total(%User{}, map()) :: {integer(), integer()}
-  def get_budget_count_and_total(user = %User{}, options) do
+  @spec get_budget_count_and_total(User.t(), map()) :: {integer(), integer()}
+  def get_budget_count_and_total(%User{} = user, options) do
     list_budgets(user, options)
     |> Enum.reduce({0, 0}, fn budget, {count, total} ->
       {count + 1, total + budget.cost}

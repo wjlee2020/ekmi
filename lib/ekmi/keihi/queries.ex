@@ -12,7 +12,7 @@ defmodule Ekmi.Keihi.Queries do
       preload: [:category]
   end
 
-  def where_user(user = %User{}) do
+  def where_user(%User{} = user) do
     case user
          |> Repo.preload(:partner_relation)
          |> Map.get(:partner_relation) do

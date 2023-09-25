@@ -1,4 +1,6 @@
 defmodule Ekmi.Accounts.UserNotifier do
+  @moduledoc false
+
   import Swoosh.Email
 
   alias Ekmi.Mailer

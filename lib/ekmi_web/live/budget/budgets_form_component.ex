@@ -1,4 +1,6 @@
 defmodule EkmiWeb.BudgetsFormComponent do
+  @moduledoc false
+
   use EkmiWeb, :live_component
 
   alias Ekmi.{Keihi, Repo}
