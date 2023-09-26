@@ -18,7 +18,11 @@
 
 <h1 class="text-3xl font-bold">Hello <%= @username %>!</h1>
 
-<Budgets.Components.monthly_balance balance={@balance} remaining_balance={@remaining_balance} />
+<Budgets.Components.monthly_balance
+  balance={@balance}
+  class="flex flex-col sm:flex-row sm:gap-4"
+  remaining_balance={@remaining_balance}
+/>
 
 <div class="w-full rounded-full h-2.5 mb-4 bg-gray-700">
   <div
@@ -110,4 +114,10 @@
   Add a budget
 </.link>
 
-<%!-- <.live_component module={BudgetsChartComponent} id={:budget_chart} budgets={@streams.budgets} /> --%>
+<.live_component
+  module={BudgetsChartComponent}
+  id={:budget_chart}
+  current_user={@current_user}
+  balance={@balance}
+  remaining_balance={@remaining_balance}
+/>

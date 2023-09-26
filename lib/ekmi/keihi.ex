@@ -194,9 +194,7 @@ defmodule Ekmi.Keihi do
   @spec get_budget_count_and_total(User.t()) :: {integer(), integer()}
   def get_budget_count_and_total(%User{} = user) do
     list_budgets(user)
-    |> Enum.reduce({0, 0}, fn budget, {count, total} ->
-      {count + 1, total + budget.cost}
-    end)
+    |> budget_count_and_total()
   end
 
   @doc """
@@ -214,8 +212,13 @@ defmodule Ekmi.Keihi do
       {3, 5000}
   """
   @spec get_budget_count_and_total(User.t(), map()) :: {integer(), integer()}
-  def get_budget_count_and_total(%User{} = user, options) do
+  def get_budget_count_and_total(%User{} = user, options) when is_map(options) do
     list_budgets(user, options)
+    |> budget_count_and_total()
+  end
+
+  def budget_count_and_total(budgets) do
+    budgets
     |> Enum.reduce({0, 0}, fn budget, {count, total} ->
       {count + 1, total + budget.cost}
     end)

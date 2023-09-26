@@ -19,7 +19,7 @@ defmodule EkmiWeb.Budgets.Components do
         3 -> "🏠"
         4 -> "💡"
         5 -> "🌃"
-        6 -> "𖧢"
+        6 -> "💸"
       end
 
     is_current_users_budget = assigns.budget.user_id == assigns.user_id
@@ -59,6 +59,7 @@ defmodule EkmiWeb.Budgets.Components do
 
   attr :balance, :integer, required: true
   attr :remaining_balance, :integer, required: true
+  attr :class, :string, default: "flex flex-col sm:flex-row sm:gap-4"
 
   def monthly_balance(assigns) do
     {:ok, current_spending} = Cldr.Number.to_string(assigns.balance - assigns.remaining_balance)
@@ -70,19 +71,38 @@ defmodule EkmiWeb.Budgets.Components do
       |> assign(:remaining_balance, remaining_balance)
       |> assign(:balance, balance)
       |> assign(:current_spending, current_spending)
+      |> assign(:class, assigns.class)
 
     ~H"""
-    <div class="flex flex-col sm:flex-row sm:gap-4">
-      <span>
-        Remaining Balance: <%= @remaining_balance %> 円
-      </span>
-
+    <div class={@class}>
       <span>
         Total Balance: <%= @balance %> 円
       </span>
 
       <span>
+        Remaining Balance: <%= @remaining_balance %> 円
+      </span>
+
+      <span class="ml-auto text-red-400 font-medium">
         Spent: <%= @current_spending %> 円
+      </span>
+    </div>
+    """
+  end
+
+  attr :class, :string, default: "flex flex-col sm:flex-row sm:gap-4"
+  attr :total_count, :integer, required: true
+  attr :total_budget_cost, :integer, required: true
+
+  def totals(assigns) do
+    ~H"""
+    <div class={@class}>
+      <span>
+        Total Count: <%= @total_count %>
+      </span>
+
+      <span class="ml-auto text-red-400 font-medium">
+        Total Cost: <%= @total_budget_cost %> 円
       </span>
     </div>
     """

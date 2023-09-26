@@ -21,12 +21,10 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
-// import BudgetChart from "./chart/budget_chart";
 import ScrollDown from "./scroll";
 import Uploaders from "./uploaders";
 
 let Hooks = {};
-// Hooks.BudgetChart = BudgetChart;
 Hooks.ScrollDown = ScrollDown;
 
 let csrfToken = document
