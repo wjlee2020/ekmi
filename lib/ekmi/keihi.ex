@@ -12,7 +12,7 @@ defmodule Ekmi.Keihi do
   @pubsub Ekmi.PubSub
 
   @type ecto_changeset :: Ecto.Changeset.t()
-  @type budget :: %Budget{}
+  @type budget :: Budget.t()
   @type options :: %{
           sort_by: atom(),
           sort_order: atom(),
@@ -217,6 +217,16 @@ defmodule Ekmi.Keihi do
     |> budget_count_and_total()
   end
 
+  @doc """
+  Calculates the total cost of all budgets for the given list of budgets
+
+  ## Parameters
+      - `budgets`: List of budget struct.
+
+  ## Returns
+      - A tuple containing the total count of and the cost of given list of budgets
+  """
+  @spec budget_count_and_total(list(budget)) :: {integer(), integer()}
   def budget_count_and_total(budgets) do
     budgets
     |> Enum.reduce({0, 0}, fn budget, {count, total} ->

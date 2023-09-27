@@ -17,23 +17,14 @@ defmodule EkmiWeb.BudgetsChartComponent do
     {total_count, total_budget_cost} = Keihi.budget_count_and_total(budgets)
     {:ok, total_budget_cost} = Cldr.Number.to_string(total_budget_cost)
 
-    data =
-      budgets
-      |> Enum.group_by(& &1.category.name, & &1.cost)
-      |> Enum.map(fn {name, costs} ->
-        total_cost = Enum.sum(costs)
-        ["#{name} (#{total_cost})", total_cost]
-      end)
-      |> Enum.sort_by(&Enum.at(&1, 1), &>=/2)
-
     assigns =
       assigns
-      |> assign(:data, data)
+      |> assign(:data, contex_data(budgets))
       |> assign(:total_count, total_count)
       |> assign(:total_budget_cost, total_budget_cost)
 
     ~H"""
-    <div class="mt-36">
+    <div class="mt-16">
       <hr class="h-px mb-16 bg-gray-200 border-0 dark:bg-gray-700" />
 
       <div class="flex flex-col sm:flex-row">
@@ -64,5 +55,15 @@ defmodule EkmiWeb.BudgetsChartComponent do
 
     Contex.Plot.new(dataset, Contex.PieChart, 1000, 650, opts)
     |> Contex.Plot.to_svg()
+  end
+
+  defp contex_data(budgets) do
+    budgets
+    |> Enum.group_by(& &1.category.name, & &1.cost)
+    |> Enum.map(fn {name, costs} ->
+      total_cost = Enum.sum(costs)
+      ["#{name} (#{total_cost})", total_cost]
+    end)
+    |> Enum.sort_by(&Enum.at(&1, 1), &>=/2)
   end
 end

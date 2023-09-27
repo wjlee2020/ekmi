@@ -83,7 +83,7 @@ defmodule EkmiWeb.Budgets.Components do
         Remaining Balance: <%= @remaining_balance %> 円
       </span>
 
-      <span class="ml-auto text-red-400 font-medium">
+      <span class="sm:ml-auto text-red-400 font-medium">
         Spent: <%= @current_spending %> 円
       </span>
     </div>
