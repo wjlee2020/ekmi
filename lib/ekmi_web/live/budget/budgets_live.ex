@@ -11,8 +11,8 @@ defmodule EkmiWeb.BudgetsLive do
   alias EkmiWeb.{Budgets, BudgetsChartComponent, BudgetsFormComponent}
 
   @s3_bucket "ekmi-uploads"
-  @s3_url "//#{@s3_bucket}.s3.amazonaws.com"
   @s3_region "ap-northeast-1"
+  @s3_url "//#{@s3_bucket}.s3-#{@s3_region}.amazonaws.com"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -245,6 +245,8 @@ defmodule EkmiWeb.BudgetsLive do
   end
 
   defp presign_upload(entry, socket) do
+    key = "public/#{entry.uuid}-#{entry.client_name}"
+
     config = %{
       region: @s3_region,
       access_key_id: System.fetch_env!("AWS_ACCESS_KEY_ID"),
@@ -252,16 +254,16 @@ defmodule EkmiWeb.BudgetsLive do
     }
 
     {:ok, fields} =
-      SimpleS3Upload.sign_form_upload(config, "my-bucket",
-        key: "public/my-file-name",
+      SimpleS3Upload.sign_form_upload(config, @s3_bucket,
+        key: key,
         content_type: "image/png",
-        max_file_size: socket.assigns.uploads.photos.max_file_size,
+        max_file_size: socket.assigns.uploads.receipt_img.max_file_size,
         expires_in: :timer.hours(1)
       )
 
     metadata = %{
       uploader: "S3",
-      key: "#{entry.uuid}-#{entry.client_name}",
+      key: key,
       url: @s3_url,
       fields: fields
     }

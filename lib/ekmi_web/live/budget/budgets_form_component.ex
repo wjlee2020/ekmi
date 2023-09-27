@@ -7,6 +7,10 @@ defmodule EkmiWeb.BudgetsFormComponent do
   alias Ekmi.Keihi.Budget
   alias EkmiWeb.SVGs
 
+  @s3_bucket "ekmi-uploads"
+  @s3_region "ap-northeast-1"
+  @s3_url "//#{@s3_bucket}.s3-#{@s3_region}.amazonaws.com"
+
   @impl Phoenix.LiveComponent
   def mount(socket) do
     changeset = Keihi.change_budget(%Budget{})
@@ -397,20 +401,8 @@ defmodule EkmiWeb.BudgetsFormComponent do
   end
 
   defp consume_receipt_img(socket) do
-    consume_uploaded_entries(socket, :receipt_img, fn meta, entry ->
-      dest =
-        Path.join([
-          "priv",
-          "static",
-          "uploads",
-          "#{entry.uuid}-#{entry.client_name}"
-        ])
-
-      File.cp!(meta.path, dest)
-
-      url_path = static_path(socket, "/uploads/#{Path.basename(dest)}")
-
-      {:ok, url_path}
+    consume_uploaded_entries(socket, :receipt_img, fn _meta, entry ->
+      {:ok, Path.join(@s3_url, "public/#{entry.uuid}-#{entry.client_name}")}
     end)
   end
 end
