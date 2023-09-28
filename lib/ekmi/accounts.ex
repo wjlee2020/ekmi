@@ -121,6 +121,59 @@ defmodule Ekmi.Accounts do
   end
 
   @doc """
+  Deletes user with given email and password.
+
+  ## Parameters
+      - attrs: A map containing:
+        - "email": The email of the user.
+        - "password": The password of the user.
+
+  ## Returns
+    - {:ok, any()} - On successful deletion of the user.
+    - {:error, :update_partner, changeset, %{}} - if update partner fails
+    - {:error, :user, msg, %{}} - if getting a user fails
+      - {:error, Ecto.Multi.name(), any(), %{required(Ecto.Multi.name()) => any()}} - Detailed error from `Ecto.Multi`.
+  """
+  @spec delete_user(%{required(String.t()) => String.t(), required(String.t()) => String.t()}) ::
+          {:ok, any}
+          | {:error, Ecto.Multi.name(), any, %{required(Ecto.Multi.name()) => any}}
+  def delete_user(attrs) do
+    Multi.new()
+    |> Multi.run(:user, fn _repo, _changes ->
+      case get_user_by_email_and_password(attrs["email"], attrs["password"]) do
+        nil -> {:error, "User not found. Check your credential"}
+        user -> {:ok, user}
+      end
+    end)
+    |> Multi.run(:update_partner, fn repo, %{user: user} ->
+      partner = get_partner(user)
+
+      case partner do
+        nil ->
+          {:ok, nil}
+
+        partner ->
+          update_partner_change =
+            User.delete_partner_changeset(partner, %{
+              has_partner: false,
+              partner_requested: false,
+              requested_email: "",
+              requested_by: ""
+            })
+
+          repo.update(User, update_partner_change)
+      end
+    end)
+    |> Multi.delete(:delete, fn %{user: user} ->
+      user
+    end)
+    |> Multi.delete_all(:oban_jobs, fn %{user: user} ->
+      Oban.Job |> where([j], j.args["user"]["id"] == ^user.id)
+    end)
+    |> Repo.transaction()
+  end
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking user changes.
 
   ## Examples
@@ -150,6 +203,10 @@ defmodule Ekmi.Accounts do
 
   def change_user_detail(%User{} = user, attrs \\ %{}) do
     User.name_changeset(user, attrs)
+  end
+
+  def change_delete_user(%User{} = user, attrs \\ %{}) do
+    User.delete_user_changeset(user, attrs)
   end
 
   def update_user_detail(user, attrs \\ %{}) do
@@ -485,6 +542,11 @@ defmodule Ekmi.Accounts do
       {:error, msg} -> {:error, msg}
     end
   end
+
+  def get_partner(%User{} = user) when user.has_partner,
+    do: get_user_by_email(user.requested_email)
+
+  def get_partner(_), do: nil
 
   @doc """
   Creates user's finance based on attrs.

@@ -54,6 +54,13 @@ defmodule Ekmi.Accounts.User do
     |> validate_password(opts)
   end
 
+  def delete_user_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :password])
+    |> validate_email(opts)
+    |> validate_password(opts)
+  end
+
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])
@@ -150,6 +157,11 @@ defmodule Ekmi.Accounts.User do
     user
     |> cast(attrs, [:has_partner])
     |> validate_required([:has_partner])
+  end
+
+  def delete_partner_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:has_partner, :partner_requested, :requested_email, :requested_by])
   end
 
   @doc """

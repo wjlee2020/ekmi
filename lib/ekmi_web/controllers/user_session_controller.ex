@@ -34,6 +34,29 @@ defmodule EkmiWeb.UserSessionController do
     end
   end
 
+  def delete(conn, %{"user" => user_params}) do
+    case Accounts.delete_user(user_params) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Deleted account successfully.")
+        |> UserAuth.log_out_user()
+
+      {:error, :user, msg, _} ->
+        conn
+        |> put_flash(:error, msg)
+        |> redirect(to: ~p"/users/settings")
+
+      {:error, :update_partner, _changeset} ->
+        conn
+        |> put_flash(:error, "Failed to delete. Please try again.")
+        |> redirect(to: ~p"/users/settings")
+
+      {:error, _} ->
+        conn
+        |> put_flash(:error, "Unable to delete account. Check your password")
+    end
+  end
+
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "Logged out successfully.")

@@ -81,6 +81,7 @@ defmodule EkmiWeb.Router do
     pipe_through [:browser]
 
     delete "/users/log_out", UserSessionController, :delete
+    delete "/users/delete", UserSessionController, :delete
 
     live_session :current_user,
       on_mount: [{EkmiWeb.UserAuth, :mount_current_user}] do

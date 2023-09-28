@@ -2,7 +2,7 @@ defmodule EkmiWeb.UserSettingsLive do
   use EkmiWeb, :live_view
 
   alias Ekmi.Accounts
-  alias EkmiWeb.Finance
+  alias EkmiWeb.{Finance, UserSettings}
 
   def render(assigns) do
     ~H"""
@@ -12,82 +12,23 @@ defmodule EkmiWeb.UserSettingsLive do
     </.header>
 
     <div class="space-y-12 divide-y lg:w-[600px] mx-auto">
-      <div>
-        <.simple_form
-          for={@name_form}
-          id="name_form"
-          phx-submit="update_name"
-          phx-change="validate_name"
-        >
-          <.input field={@name_form[:name]} label="Name" />
-
-          <:actions>
-            <.button phx-disable-with="Changing...">Change Name</.button>
-          </:actions>
-        </.simple_form>
-      </div>
+      <UserSettings.Components.name_form name_form={@name_form} />
 
       <Finance.Components.finance_form finance_form={@finance_form} />
 
-      <div>
-        <.simple_form
-          for={@email_form}
-          id="email_form"
-          phx-submit="update_email"
-          phx-change="validate_email"
-        >
-          <.input field={@email_form[:email]} type="email" label="Email" required />
-          <.input
-            field={@email_form[:current_password]}
-            name="current_password"
-            id="current_password_for_email"
-            type="password"
-            label="Current password"
-            value={@email_form_current_password}
-            required
-          />
-          <:actions>
-            <.button phx-disable-with="Changing...">Change Email</.button>
-          </:actions>
-        </.simple_form>
-      </div>
+      <UserSettings.Components.email_form
+        email_form={@email_form}
+        email_form_current_password={@email_form_current_password}
+      />
 
-      <div>
-        <.simple_form
-          for={@password_form}
-          id="password_form"
-          action={~p"/users/log_in?_action=password_updated"}
-          method="post"
-          phx-change="validate_password"
-          phx-submit="update_password"
-          phx-trigger-action={@trigger_submit}
-        >
-          <.input
-            field={@password_form[:email]}
-            type="hidden"
-            id="hidden_user_email"
-            value={@current_email}
-          />
-          <.input field={@password_form[:password]} type="password" label="New password" required />
-          <.input
-            field={@password_form[:password_confirmation]}
-            type="password"
-            label="Confirm new password"
-          />
-          <.input
-            field={@password_form[:current_password]}
-            name="current_password"
-            type="password"
-            label="Current password"
-            id="current_password_for_password"
-            value={@current_password}
-            required
-          />
-          <:actions>
-            <.button phx-disable-with="Changing...">Change Password</.button>
-          </:actions>
-        </.simple_form>
-      </div>
+      <UserSettings.Components.password_form
+        password_form={@password_form}
+        current_email={@current_email}
+        current_password={@current_password}
+        trigger_submit={@trigger_submit}
+      />
+
+      <UserSettings.Components.delete_account user_form={@user_form} />
     </div>
     """
   end
@@ -107,6 +48,7 @@ defmodule EkmiWeb.UserSettingsLive do
 
   def mount(_params, _session, socket) do
     user = socket.assigns.current_user
+    user_changeset = Accounts.change_delete_user(user)
     email_changeset = Accounts.change_user_email(user)
     name_change = Accounts.change_user_detail(user)
     password_changeset = Accounts.change_user_password(user)
@@ -122,6 +64,7 @@ defmodule EkmiWeb.UserSettingsLive do
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:finance_form, to_form(finance_changeset))
       |> assign(:name_form, to_form(name_change))
+      |> assign(:user_form, to_form(user_changeset))
       |> assign(:trigger_submit, false)
 
     {:ok, socket}
