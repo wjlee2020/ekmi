@@ -14,7 +14,7 @@ defmodule Ekmi.Accounts do
   @pubsub Ekmi.PubSub
 
   @type ecto_changeset :: Ecto.Changeset.t()
-  @type finance :: %Finance{}
+  @type finance :: Finance.t()
   @user_not_found "Failed to find user. Please try again."
 
   def subscribe do
@@ -389,6 +389,10 @@ defmodule Ekmi.Accounts do
       _ -> :error
     end
   end
+
+  @spec check_user_confirmed(User.t()) :: boolean()
+  def check_user_confirmed(%{confirmed_at: nil}), do: false
+  def check_user_confirmed(_user), do: true
 
   defp confirm_user_multi(user) do
     Multi.new()

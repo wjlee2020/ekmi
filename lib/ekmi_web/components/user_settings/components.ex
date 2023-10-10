@@ -84,11 +84,18 @@ defmodule EkmiWeb.UserSettings.Components do
   def delete_account(assigns) do
     ~H"""
     <.simple_form for={@user_form} id="user_form" method="delete" action={~p"/users/delete"}>
-      <.input field={@user_form[:email]} label="Email" required />
-      <.input type="password" field={@user_form[:password]} label="Password" required />
+      <.input id={:delete_account_email} field={@user_form[:email]} label="Email" required />
+      <.input
+        id={:delete_account_pw}
+        type="password"
+        field={@user_form[:password]}
+        label="Password"
+        required
+      />
 
       <:actions>
         <.button
+          destructive={true}
           phx-disable-with="Deleting"
           class="bg-red-700 hover:bg-red-400"
           data-confirm="This will delete all your records and your account. Continue?"

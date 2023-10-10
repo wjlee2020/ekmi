@@ -1,4 +1,5 @@
 defmodule EkmiWeb.Nav.SidebarLive do
+  alias Ekmi.Accounts
   use EkmiWeb, :live_component
 
   alias Phoenix.LiveView.JS
@@ -12,9 +13,11 @@ defmodule EkmiWeb.Nav.SidebarLive do
 
   @impl true
   def render(assigns) do
+    current_user = assigns.current_user
+
     partner_notification =
-      case assigns.current_user && assigns.current_user.partner_requested &&
-             !assigns.current_user.has_partner do
+      case current_user && current_user.partner_requested &&
+             !current_user.has_partner do
         true -> 1
         nil -> nil
         false -> nil
@@ -23,6 +26,7 @@ defmodule EkmiWeb.Nav.SidebarLive do
     assigns =
       assigns
       |> assign(:partner_notification, partner_notification)
+      |> assign(:confirmed_user, Accounts.check_user_confirmed(current_user))
 
     ~H"""
     <div class="relative">
@@ -64,53 +68,67 @@ defmodule EkmiWeb.Nav.SidebarLive do
           </span>
         </.link>
 
-        <ul class="space-y-2 font-medium">
-          <li>
-            <.link
-              navigate={~p"/budgets"}
-              class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
-            >
-              <SVGs.currency id="currency" />
-              <span class="ml-3">Budgets</span>
-            </.link>
-          </li>
-
-          <li>
-            <.link
-              navigate={~p"/partners"}
-              class="relative flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
-            >
-              <SVGs.people id="people" />
-              <span class="flex-1 ml-3 whitespace-nowrap">Partners</span>
-              <%= if @partner_notification do %>
-                <span class="sr-only">Notifications</span>
-                <div class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -left-2 dark:border-gray-900">
-                  <%= @partner_notification %>
-                </div>
-              <% end %>
-            </.link>
-          </li>
-
-          <li>
-            <.link
-              navigate={~p"/messages"}
-              class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
-            >
-              <SVGs.message id="message" />
-              <span class="flex-1 ml-3 whitespace-nowrap">Messages</span>
-            </.link>
-          </li>
-          <li>
-            <.link
-              navigate={~p"/users/settings"}
-              class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
-            >
-              <SVGs.settings id="settings" />
-              <span class="flex-1 ml-3 whitespace-nowrap">Settings</span>
-            </.link>
-          </li>
-        </ul>
+        <%= sidebar_links(assigns) %>
       </div>
+    </div>
+    """
+  end
+
+  defp sidebar_links(assigns) when assigns.confirmed_user do
+    ~H"""
+    <ul class="space-y-2 font-medium">
+      <li>
+        <.link
+          navigate={~p"/budgets"}
+          class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
+        >
+          <SVGs.currency id="currency" />
+          <span class="ml-3">Budgets</span>
+        </.link>
+      </li>
+
+      <li>
+        <.link
+          navigate={~p"/partners"}
+          class="relative flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
+        >
+          <SVGs.people id="people" />
+          <span class="flex-1 ml-3 whitespace-nowrap">Partners</span>
+          <%= if @partner_notification do %>
+            <span class="sr-only">Notifications</span>
+            <div class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -left-2 dark:border-gray-900">
+              <%= @partner_notification %>
+            </div>
+          <% end %>
+        </.link>
+      </li>
+
+      <li>
+        <.link
+          navigate={~p"/messages"}
+          class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
+        >
+          <SVGs.message id="message" />
+          <span class="flex-1 ml-3 whitespace-nowrap">Messages</span>
+        </.link>
+      </li>
+      <li>
+        <.link
+          navigate={~p"/users/settings"}
+          class="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
+        >
+          <SVGs.settings id="settings" />
+          <span class="flex-1 ml-3 whitespace-nowrap">Settings</span>
+        </.link>
+      </li>
+    </ul>
+    """
+  end
+
+  defp sidebar_links(assigns) do
+    ~H"""
+    <div class="text-white">
+      <p>Please check your email for a confirmation email!</p>
     </div>
     """
   end
