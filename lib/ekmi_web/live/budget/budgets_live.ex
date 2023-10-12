@@ -18,6 +18,8 @@ defmodule EkmiWeb.BudgetsLive do
   def mount(_params, _session, socket) do
     if connected?(socket), do: Keihi.subscribe()
 
+    current_user = socket.assigns.current_user
+
     socket =
       socket
       |> assign(
@@ -31,6 +33,7 @@ defmodule EkmiWeb.BudgetsLive do
         max_file_size: 10_000_000,
         external: &presign_upload/2
       )
+      |> assign(:confirmed_user, Accounts.check_user_confirmed(current_user))
 
     {:ok, socket}
   end
@@ -162,6 +165,29 @@ defmodule EkmiWeb.BudgetsLive do
     <form phx-change="filter">
       <input class="border-0 rounded-lg" id="budget_ym" type="month" name="budget_ym" value={@date} />
     </form>
+    """
+  end
+
+  def confirmed_user_add_budget(assigns) when assigns.confirmed_user do
+    ~H"""
+    <.link
+      patch={~p"/budgets/new?#{@options}"}
+      class="py-2.5 px-5 text-sm font-mediumfocus:outline-none rounded-lg border focus:z-10 focus:ring-4 focus:ring-gray-700 bg-gray-800 text-gray-200 border-gray-600 hover:text-white hover:bg-gray-700"
+    >
+      Add a budget
+    </.link>
+    """
+  end
+
+  def confirmed_user_add_budget(assigns) do
+    ~H"""
+    <.link
+      data-confirm="You need to confirm your email before adding any budgets"
+      patch={~p"/budgets"}
+      class="py-2.5 px-5 text-sm font-mediumfocus:outline-none rounded-lg border focus:z-10 focus:ring-4 focus:ring-gray-700 bg-gray-800 text-gray-200 border-gray-600 hover:text-white hover:bg-gray-700"
+    >
+      Add a budget
+    </.link>
     """
   end
 
