@@ -8,7 +8,7 @@ defmodule EkmiWeb.UserSessionControllerTest do
   end
 
   describe "POST /users/log_in" do
-    test "logs the user in", %{conn: conn, user: user} do
+    test "logs the user in", %{conn: conn, user: %{user: user}} do
       conn =
         post(conn, ~p"/users/log_in", %{
           "user" => %{"email" => user.email, "password" => valid_user_password()}
@@ -17,15 +17,15 @@ defmodule EkmiWeb.UserSessionControllerTest do
       assert get_session(conn, :user_token)
       assert redirected_to(conn) == ~p"/"
 
-      # Now do a logged in request and assert on the menu
+      # Now do a logged in request and assert redirect
       conn = get(conn, ~p"/")
-      response = html_response(conn, 200)
-      assert response =~ user.email
-      assert response =~ ~p"/users/settings"
-      assert response =~ ~p"/users/log_out"
+      response = html_response(conn, 302)
+
+      assert response =~
+               "<html><body>You are being <a href=\"/budgets\">redirected</a>.</body></html>"
     end
 
-    test "logs the user in with remember me", %{conn: conn, user: user} do
+    test "logs the user in with remember me", %{conn: conn, user: %{user: user}} do
       conn =
         post(conn, ~p"/users/log_in", %{
           "user" => %{
@@ -39,7 +39,7 @@ defmodule EkmiWeb.UserSessionControllerTest do
       assert redirected_to(conn) == ~p"/"
     end
 
-    test "logs the user in with return to", %{conn: conn, user: user} do
+    test "logs the user in with return to", %{conn: conn, user: %{user: user}} do
       conn =
         conn
         |> init_test_session(user_return_to: "/foo/bar")
@@ -54,7 +54,7 @@ defmodule EkmiWeb.UserSessionControllerTest do
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Welcome back!"
     end
 
-    test "login following registration", %{conn: conn, user: user} do
+    test "login following registration", %{conn: conn, user: %{user: user}} do
       conn =
         conn
         |> post(~p"/users/log_in", %{
@@ -69,7 +69,7 @@ defmodule EkmiWeb.UserSessionControllerTest do
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Account created successfully"
     end
 
-    test "login following password update", %{conn: conn, user: user} do
+    test "login following password update", %{conn: conn, user: %{user: user}} do
       conn =
         conn
         |> post(~p"/users/log_in", %{
@@ -96,7 +96,7 @@ defmodule EkmiWeb.UserSessionControllerTest do
   end
 
   describe "DELETE /users/log_out" do
-    test "logs the user out", %{conn: conn, user: user} do
+    test "logs the user out", %{conn: conn, user: %{user: user}} do
       conn = conn |> log_in_user(user) |> delete(~p"/users/log_out")
       assert redirected_to(conn) == ~p"/"
       refute get_session(conn, :user_token)

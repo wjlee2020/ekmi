@@ -52,7 +52,6 @@ defmodule EkmiWeb.Router do
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{EkmiWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      # Memo: I don't want anyone to be able to register, yet.
       live "/users/register", UserRegistrationLive, :new
       live "/users/log_in", UserLoginLive, :new
       live "/users/reset_password", UserForgotPasswordLive, :new
@@ -68,12 +67,20 @@ defmodule EkmiWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [{EkmiWeb.UserAuth, :ensure_authenticated}] do
       live "/budgets", BudgetsLive
+      live "/users/settings", UserSettingsLive, :edit
+      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+    end
+  end
+
+  scope "/", EkmiWeb do
+    pipe_through [:browser, :require_confirmed_user]
+
+    live_session :require_confirmed_user,
+      on_mount: [{EkmiWeb.UserAuth, :ensure_authenticated}] do
       live "/budgets/new", BudgetsLive, :new
       live "/budgets/:id", BudgetsLive, :edit
       live "/messages", MessagesLive
       live "/partners", PartnersLive
-      live "/users/settings", UserSettingsLive, :edit
-      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
   end
 

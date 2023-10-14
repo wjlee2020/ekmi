@@ -5,7 +5,11 @@ defmodule EkmiWeb.UserSessionController do
   alias EkmiWeb.UserAuth
 
   def create(conn, %{"_action" => "registered"} = params) do
-    create(conn, params, "Account created successfully!")
+    create(
+      conn,
+      params,
+      "Account created successfully! Please check your email for a confirmation link."
+    )
   end
 
   def create(conn, %{"_action" => "password_updated"} = params) do
@@ -46,12 +50,12 @@ defmodule EkmiWeb.UserSessionController do
         |> put_flash(:error, msg)
         |> redirect(to: ~p"/users/settings")
 
-      {:error, :update_partner, _changeset} ->
+      {:error, :update_partner, _, _changeset} ->
         conn
         |> put_flash(:error, "Failed to delete. Please try again.")
         |> redirect(to: ~p"/users/settings")
 
-      {:error, _} ->
+      {:error, _, _, _} ->
         conn
         |> put_flash(:error, "Unable to delete account. Check your password")
     end

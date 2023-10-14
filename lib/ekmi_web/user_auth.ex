@@ -213,6 +213,21 @@ defmodule EkmiWeb.UserAuth do
     end
   end
 
+  @doc """
+  Used for routes that require user to be confirmed.
+  """
+  def require_confirmed_user(conn, _opts) do
+    if Accounts.check_user_confirmed(conn.assigns[:current_user]) do
+      conn
+    else
+      conn
+      |> put_flash(:error, "Please check your email for a confirmation link")
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/budgets")
+      |> halt()
+    end
+  end
+
   defp put_token_in_session(conn, token) do
     conn
     |> put_session(:user_token, token)
