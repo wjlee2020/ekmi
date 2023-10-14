@@ -18,7 +18,7 @@ defmodule EkmiWeb.UserAuthTest do
   end
 
   describe "log_in_user/3" do
-    test "stores the user token in the session", %{conn: conn, user: user} do
+    test "stores the user token in the session", %{conn: conn, user: %{user: user}} do
       conn = UserAuth.log_in_user(conn, user)
       assert token = get_session(conn, :user_token)
       assert get_session(conn, :live_socket_id) == "users_sessions:#{Base.url_encode64(token)}"
@@ -26,17 +26,17 @@ defmodule EkmiWeb.UserAuthTest do
       assert Accounts.get_user_by_session_token(token)
     end
 
-    test "clears everything previously stored in the session", %{conn: conn, user: user} do
+    test "clears everything previously stored in the session", %{conn: conn, user: %{user: user}} do
       conn = conn |> put_session(:to_be_removed, "value") |> UserAuth.log_in_user(user)
       refute get_session(conn, :to_be_removed)
     end
 
-    test "redirects to the configured path", %{conn: conn, user: user} do
+    test "redirects to the configured path", %{conn: conn, user: %{user: user}} do
       conn = conn |> put_session(:user_return_to, "/hello") |> UserAuth.log_in_user(user)
       assert redirected_to(conn) == "/hello"
     end
 
-    test "writes a cookie if remember_me is configured", %{conn: conn, user: user} do
+    test "writes a cookie if remember_me is configured", %{conn: conn, user: %{user: user}} do
       conn = conn |> fetch_cookies() |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
       assert get_session(conn, :user_token) == conn.cookies[@remember_me_cookie]
 
@@ -47,7 +47,7 @@ defmodule EkmiWeb.UserAuthTest do
   end
 
   describe "logout_user/1" do
-    test "erases session and cookies", %{conn: conn, user: user} do
+    test "erases session and cookies", %{conn: conn, user: %{user: user}} do
       user_token = Accounts.generate_user_session_token(user)
 
       conn =
@@ -84,13 +84,13 @@ defmodule EkmiWeb.UserAuthTest do
   end
 
   describe "fetch_current_user/2" do
-    test "authenticates user from session", %{conn: conn, user: user} do
+    test "authenticates user from session", %{conn: conn, user: %{user: user}} do
       user_token = Accounts.generate_user_session_token(user)
       conn = conn |> put_session(:user_token, user_token) |> UserAuth.fetch_current_user([])
       assert conn.assigns.current_user.id == user.id
     end
 
-    test "authenticates user from cookies", %{conn: conn, user: user} do
+    test "authenticates user from cookies", %{conn: conn, user: %{user: user}} do
       logged_in_conn =
         conn |> fetch_cookies() |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
 
@@ -109,7 +109,7 @@ defmodule EkmiWeb.UserAuthTest do
                "users_sessions:#{Base.url_encode64(user_token)}"
     end
 
-    test "does not authenticate if data is missing", %{conn: conn, user: user} do
+    test "does not authenticate if data is missing", %{conn: conn, user: %{user: user}} do
       _ = Accounts.generate_user_session_token(user)
       conn = UserAuth.fetch_current_user(conn, [])
       refute get_session(conn, :user_token)
@@ -118,7 +118,7 @@ defmodule EkmiWeb.UserAuthTest do
   end
 
   describe "on_mount: mount_current_user" do
-    test "assigns current_user based on a valid user_token", %{conn: conn, user: user} do
+    test "assigns current_user based on a valid user_token", %{conn: conn, user: %{user: user}} do
       user_token = Accounts.generate_user_session_token(user)
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
@@ -149,7 +149,10 @@ defmodule EkmiWeb.UserAuthTest do
   end
 
   describe "on_mount: ensure_authenticated" do
-    test "authenticates current_user based on a valid user_token", %{conn: conn, user: user} do
+    test "authenticates current_user based on a valid user_token", %{
+      conn: conn,
+      user: %{user: user}
+    } do
       user_token = Accounts.generate_user_session_token(user)
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
@@ -186,7 +189,7 @@ defmodule EkmiWeb.UserAuthTest do
   end
 
   describe "on_mount: :redirect_if_user_is_authenticated" do
-    test "redirects if there is an authenticated  user ", %{conn: conn, user: user} do
+    test "redirects if there is an authenticated  user ", %{conn: conn, user: %{user: user}} do
       user_token = Accounts.generate_user_session_token(user)
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
