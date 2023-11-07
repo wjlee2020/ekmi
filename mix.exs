@@ -39,9 +39,15 @@ defmodule Ekmi.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 3.3.2"},
       {:phoenix_live_reload, "~> 1.4.1", only: :dev},
-      {:phoenix_live_view, "~> 0.19.5"},
+      {:phoenix_live_view,
+       [
+         env: :prod,
+         git: "https://github.com/phoenixframework/phoenix_live_view.git",
+         branch: "main",
+         override: true
+       ]},
       {:floki, ">= 0.30.0", only: :test},
-      {:phoenix_live_dashboard, "~> 0.8.0"},
+      {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2.1", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.3"},
