@@ -101,7 +101,7 @@ defmodule EkmiWeb.Budgets.Components do
         Total Count: <%= @total_count %>
       </span>
 
-      <span class="ml-auto text-red-400 font-medium">
+      <span class="sm:ml-auto text-red-400 font-medium">
         Total Cost: <%= @total_budget_cost %> 円
       </span>
     </div>
