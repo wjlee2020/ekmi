@@ -1,4 +1,8 @@
 defmodule Mix.Tasks.MigrateUserAccounts do
+  @moduledoc """
+  Migrate users table info to accounts
+  """
+
   use Mix.Task
   import Ecto.Query, only: [from: 2]
 
