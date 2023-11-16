@@ -17,6 +17,7 @@ defmodule Ekmi.Accounts.User do
     field :requested_email, :string
     field :requested_by, :string
 
+    has_one :account, Ekmi.Accounts.Account
     has_one :finance, Ekmi.Accounts.Finance
     has_one :partner_relation, Ekmi.Accounts.Partner
     has_many :budgets, Ekmi.Keihi.Budget
@@ -162,6 +163,12 @@ defmodule Ekmi.Accounts.User do
   def delete_partner_changeset(user, attrs) do
     user
     |> cast(attrs, [:has_partner, :partner_requested, :requested_email, :requested_by])
+  end
+
+  def account_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:account_id])
+    |> validate_required([:account_id])
   end
 
   @doc """
