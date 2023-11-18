@@ -1,4 +1,8 @@
 defmodule Ekmi.News do
+  @moduledoc """
+  News Module for handling all things news related.
+  """
+
   use Tesla
 
   adapter(Tesla.Adapter.Hackney)
