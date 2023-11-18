@@ -62,7 +62,9 @@ defmodule Ekmi.MixProject do
       {:ex_cldr_numbers, "~> 2.31"},
       {:oban, "~> 2.14"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:contex, "~> 0.5.0"}
+      {:contex, "~> 0.5.0"},
+      {:tesla, "~> 1.4"},
+      {:hackney, "~> 1.17"}
     ]
   end
 
