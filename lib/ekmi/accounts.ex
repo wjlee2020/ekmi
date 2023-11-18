@@ -6,7 +6,7 @@ defmodule Ekmi.Accounts do
   import Ecto.Query, warn: false
 
   alias Ecto.Multi
-  alias Ekmi.Accounts.{Finance, Partner, User, UserToken, UserNotifier}
+  alias Ekmi.Accounts.{Account, Finance, Partner, Queries, User, UserToken, UserNotifier}
   alias Ekmi.Repo
   alias Ekmi.Workers.FinanceWorker
 
@@ -47,6 +47,11 @@ defmodule Ekmi.Accounts do
   """
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
+  end
+
+  def get_user_account_by_email(email) when is_binary(email) do
+    Queries.where_user(%{email: email})
+    |> Repo.one()
   end
 
   @doc """
@@ -104,6 +109,10 @@ defmodule Ekmi.Accounts do
 
     Multi.new()
     |> Multi.insert(:user, user_changeset)
+    |> Multi.insert(:account, fn %{user: user} ->
+      %Account{}
+      |> Account.register_account_changeset(%{name: attrs["name"], user_id: user.id})
+    end)
     |> Multi.insert(:finance, fn %{user: user} ->
       %Finance{}
       |> change_finance(%{

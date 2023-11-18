@@ -1,4 +1,4 @@
-defmodule Ekmi.Repo.Migrations.CreateAccountAndUpdateUsers do
+defmodule Ekmi.Repo.Migrations.CreateAccount do
   use Ecto.Migration
 
   def change do
@@ -14,11 +14,5 @@ defmodule Ekmi.Repo.Migrations.CreateAccountAndUpdateUsers do
     end
 
     create index(:accounts, [:user_id])
-
-    alter(table(:users)) do
-      add :account_id, references(:accounts, on_delete: :nothing)
-    end
-
-    create index(:users, [:account_id])
   end
 end

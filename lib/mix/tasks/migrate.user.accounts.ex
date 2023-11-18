@@ -12,7 +12,7 @@ defmodule Mix.Tasks.MigrateUserAccounts do
     {:ok, _} = Application.ensure_all_started(:ekmi)
 
     Ekmi.Repo.transaction(fn ->
-      Ekmi.Repo.all(from(u in Ekmi.Accounts.User, where: is_nil(u.account_id)))
+      Ekmi.Repo.all(from(u in Ekmi.Accounts.User, preload: [:account]))
       |> Enum.each(fn user ->
         account_attrs = %{
           name: user.name,
