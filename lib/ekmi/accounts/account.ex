@@ -19,7 +19,15 @@ defmodule Ekmi.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:name, :has_partner, :requested_email, :requested_by, :user_id])
+    |> cast(attrs, [
+      :name,
+      :email,
+      :has_partner,
+      :partner_requested,
+      :requested_email,
+      :requested_by,
+      :user_id
+    ])
     |> validate_required([:name, :has_partner])
   end
 
