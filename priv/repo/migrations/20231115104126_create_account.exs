@@ -5,6 +5,7 @@ defmodule Ekmi.Repo.Migrations.CreateAccount do
     create table(:accounts) do
       add :user_id, references(:users, on_delete: :delete_all)
       add :name, :string
+      add :email, :string
       add :partner_requested, :boolean, default: false
       add :has_partner, :boolean, default: false
       add :requested_email, :string

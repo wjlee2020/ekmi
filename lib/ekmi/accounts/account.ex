@@ -6,6 +6,7 @@ defmodule Ekmi.Accounts.Account do
 
   schema "accounts" do
     field :name, :string
+    field :email, :string
     field :partner_requested, :boolean, default: false
     field :has_partner, :boolean, default: false
     field :requested_email, :string
@@ -26,5 +27,11 @@ defmodule Ekmi.Accounts.Account do
     account
     |> cast(attrs, [:name, :user_id])
     |> validate_required([:name, :user_id])
+  end
+
+  def requested_partner_changeset(account, attrs) do
+    account
+    |> cast(attrs, [:partner_requested, :requested_email, :requested_by])
+    |> validate_required([:partner_requested, :requested_email, :requested_by])
   end
 end

@@ -15,7 +15,7 @@ defmodule Ekmi.News do
     get(@base_url,
       query: [
         q: query,
-        from: "2023-11-18",
+        from: NaiveDateTime.local_now() |> NaiveDateTime.to_date() |> Date.to_iso8601(),
         sortBy: "popularity",
         apiKey: @api_key
       ]

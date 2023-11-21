@@ -482,20 +482,23 @@ defmodule Ekmi.Accounts do
       - {:ok, Multi} :: {:error, Multi.name}
   """
   def request_partner(%{current_user: current_user, partner_email: partner_email}) do
-    case get_user_by_email(partner_email) do
+    case get_user_account_by_email(partner_email) do
       nil ->
         {:error, @user_not_found}
 
       _user = partner_user ->
+        # todo:
+        # update account to have email + news related stuff
+        # need to get the Account struct for current user and partner user
         c_user_request_changeset =
-          User.requested_partner_changeset(current_user, %{
+          Account.requested_partner_changeset(current_user, %{
             partner_requested: true,
             requested_email: partner_email,
             requested_by: current_user.email
           })
 
         p_user_request_changeset =
-          User.requested_partner_changeset(partner_user, %{
+          Account.requested_partner_changeset(partner_user, %{
             partner_requested: true,
             requested_email: current_user.email,
             requested_by: current_user.email

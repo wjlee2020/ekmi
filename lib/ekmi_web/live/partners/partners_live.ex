@@ -13,7 +13,7 @@ defmodule EkmiWeb.PartnersLive do
       case current_user.requested_email do
         "" -> nil
         nil -> nil
-        requested_email -> Accounts.get_user_by_email(requested_email)
+        requested_email -> Accounts.get_user_account_by_email(requested_email)
       end
 
     socket =
@@ -86,9 +86,9 @@ defmodule EkmiWeb.PartnersLive do
   end
 
   def handle_event("accept-request", _params, socket) do
-    %{current_user: current_user, user: user} = socket.assigns
+    %{current_user: current_user, user: partner} = socket.assigns
 
-    case Accounts.set_partner(current_user, user) do
+    case Accounts.set_partner(current_user, partner) do
       {:ok, _} ->
         {:noreply, put_flash(socket, :info, "Successfully Accepted Request!")}
 
@@ -98,7 +98,7 @@ defmodule EkmiWeb.PartnersLive do
   end
 
   def handle_info({:run_search, user_email}, socket) do
-    case Accounts.get_user_by_email(user_email) do
+    case Accounts.get_user_account_by_email(user_email) do
       nil ->
         socket =
           socket
@@ -114,7 +114,7 @@ defmodule EkmiWeb.PartnersLive do
 
   def handle_info({:run_request, request_email}, socket) do
     case Accounts.request_partner(%{
-           current_user: socket.assigns.current_user,
+           current_user: Accounts.get_user_account_by_email(socket.assigns.current_user.email),
            partner_email: request_email
          }) do
       {:ok, _} ->

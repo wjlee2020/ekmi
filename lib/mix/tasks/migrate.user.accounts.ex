@@ -16,6 +16,7 @@ defmodule Mix.Tasks.MigrateUserAccounts do
       |> Enum.each(fn user ->
         account_attrs = %{
           name: user.name,
+          email: user.email,
           partner_requested: user.partner_requested,
           has_partner: user.has_partner,
           requested_email: user.requested_email,

@@ -9,7 +9,7 @@ defmodule EkmiWeb.PageController do
         redirect(conn, to: ~p"/users/log_in")
 
       _user ->
-        redirect(conn, to: "/budgets")
+        redirect(conn, to: "/home")
     end
   end
 end
