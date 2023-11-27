@@ -8,9 +8,10 @@ defmodule EkmiWeb.PartnersLive do
     if connected?(socket), do: Accounts.subscribe()
 
     current_user = socket.assigns.current_user
+    current_account = Accounts.get_user_account_by_email(current_user.email)
 
     partner =
-      case current_user.requested_email do
+      case current_account.requested_email do
         "" -> nil
         nil -> nil
         requested_email -> Accounts.get_user_account_by_email(requested_email)
@@ -21,7 +22,7 @@ defmodule EkmiWeb.PartnersLive do
       |> assign(:loading, false)
       |> assign(:user_email, "")
       |> assign(:user, partner)
-      |> assign(:current_user, current_user)
+      |> assign(:current_user, current_account)
 
     {:ok, socket}
   end

@@ -86,7 +86,9 @@ defmodule EkmiWeb.PartnerCardComponent do
     :accept_request
   end
 
-  defp button_type(_, _) do
+  defp button_type(c, p) do
+    IO.inspect(c)
+    IO.inspect(p)
     :request_partner
   end
 end

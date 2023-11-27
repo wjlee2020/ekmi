@@ -487,9 +487,6 @@ defmodule Ekmi.Accounts do
         {:error, @user_not_found}
 
       _user = partner_user ->
-        # todo:
-        # update account to have email + news related stuff
-        # need to get the Account struct for current user and partner user
         c_user_request_changeset =
           Account.requested_partner_changeset(current_user, %{
             partner_requested: true,
@@ -712,6 +709,8 @@ defmodule Ekmi.Accounts do
   end
 
   defp is_requested_partner(%{partner_requested: partner_requested} = user) do
+    IO.inspect(user)
+
     case partner_requested do
       true ->
         user = Repo.preload(user, [:finance, :partner_relation])
