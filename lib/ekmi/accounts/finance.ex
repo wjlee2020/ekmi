@@ -11,6 +11,7 @@ defmodule Ekmi.Accounts.Finance do
     field :currency, :string
     field :scheduled_deposit_amount, :integer
     belongs_to :user, Ekmi.Accounts.User
+    belongs_to :account, Ekmi.Accounts.Account
 
     timestamps()
   end

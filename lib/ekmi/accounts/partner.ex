@@ -6,8 +6,8 @@ defmodule Ekmi.Accounts.Partner do
 
   schema "partners" do
     field :balance, :integer
-    belongs_to :user, Ekmi.Accounts.User
-    belongs_to :partner, Ekmi.Accounts.User
+    belongs_to :account, Ekmi.Accounts.Account, foreign_key: :account_id
+    belongs_to :partner_account, Ekmi.Accounts.Account, foreign_key: :partner_account_id
 
     timestamps()
   end

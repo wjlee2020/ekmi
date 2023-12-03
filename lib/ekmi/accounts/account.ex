@@ -13,6 +13,10 @@ defmodule Ekmi.Accounts.Account do
     field :requested_by, :string
 
     belongs_to :user, Ekmi.Accounts.User
+    has_one :finance, Ekmi.Accounts.Finance
+    has_one :partner_relation, Ekmi.Accounts.Partner
+    has_many :budgets, Ekmi.Keihi.Budget
+
     timestamps()
   end
 
@@ -41,5 +45,16 @@ defmodule Ekmi.Accounts.Account do
     account
     |> cast(attrs, [:partner_requested, :requested_email, :requested_by])
     |> validate_required([:partner_requested, :requested_email, :requested_by])
+  end
+
+  def update_partner_changeset(account, attrs) do
+    account
+    |> cast(attrs, [:has_partner])
+    |> validate_required([:has_partner])
+  end
+
+  def delete_partner_changeset(account, attrs) do
+    account
+    |> cast(attrs, [:has_partner, :partner_requested, :requested_email, :requested_by])
   end
 end

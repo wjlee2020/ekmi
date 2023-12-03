@@ -395,7 +395,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
            category_id: budget["category_id"],
            description: budget["description"],
            title: budget["title"],
-           user_id: budget["user_id"]
+           account_id: budget["account_id"]
        }
      )}
   end

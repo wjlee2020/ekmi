@@ -5,6 +5,7 @@ defmodule Ekmi.Keihi do
   @moduledoc since: "1.0.0"
 
   alias Ekmi.Accounts.User
+  alias Ekmi.Accounts.Account
   alias Ekmi.Keihi.{Budget, Queries}
   alias Ekmi.Repo
 
@@ -134,6 +135,19 @@ defmodule Ekmi.Keihi do
     |> Repo.all()
   end
 
+  def list_budgets_by_account(%Account{} = account, options) when is_map(options) do
+    Queries.where_account(account)
+    |> Queries.sort(options)
+    |> Queries.paginate(options)
+    |> Queries.records_for_month(options)
+    |> Repo.all()
+  end
+
+  def list_budgets_by_account(%Account{} = account) do
+    Queries.where_account(account)
+    |> Repo.all()
+  end
+
   @doc """
   Get a single budget struct based on user_id and the budget_id.
 
@@ -161,6 +175,12 @@ defmodule Ekmi.Keihi do
   @spec find_budget(budget_id) :: budget | nil
   def find_budget(budget_id) do
     Repo.get(Budget, budget_id)
+  end
+
+  def find_budget_by_account(account_id, budget_id) do
+    Repo.one(
+      Queries.where_account_and_budget_ids(%{account_id: account_id, budget_id: budget_id})
+    )
   end
 
   @spec change_budget(budget, map()) :: ecto_changeset()
