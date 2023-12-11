@@ -136,8 +136,6 @@ defmodule Ekmi.Keihi do
   end
 
   def list_budgets_by_account(%Account{} = account, options) when is_map(options) do
-    IO.inspect(account)
-
     Queries.where_account(account)
     |> Queries.sort(options)
     |> Queries.paginate(options)
