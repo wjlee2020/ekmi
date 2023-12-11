@@ -24,7 +24,7 @@ defmodule EkmiWeb.BudgetsLive do
       socket
       |> assign(
         username: Accounts.current_username(socket.assigns.current_user),
-        user_id: socket.assigns.current_user.id
+        account_id: socket.assigns.current_user.id
       )
       |> allow_upload(
         :receipt_img,
@@ -61,7 +61,7 @@ defmodule EkmiWeb.BudgetsLive do
       month: month
     }
 
-    budgets = Keihi.list_budgets(current_user, options)
+    budgets = Keihi.list_budgets_by_account(current_user, options)
 
     {total_count, total_budget_cost} =
       Keihi.get_budget_count_and_total(current_user, %{year: year, month: month})

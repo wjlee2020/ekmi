@@ -12,7 +12,7 @@ defmodule Ekmi.Keihi.Budget do
     field :receipt_img, {:array, :string}, default: []
 
     belongs_to :category, Ekmi.Keihi.Category
-    belongs_to :user, Ekmi.Accounts.User
+    belongs_to :account, Ekmi.Accounts.Account
 
     timestamps()
   end
@@ -25,12 +25,12 @@ defmodule Ekmi.Keihi.Budget do
       :description,
       :cost,
       :category_id,
-      :user_id,
+      :account_id,
       :created_at,
       :receipt_img
     ])
-    |> validate_required([:title, :description, :cost, :category_id, :user_id, :created_at])
-    |> assoc_constraint(:user)
+    |> validate_required([:title, :description, :cost, :category_id, :account_id, :created_at])
+    |> assoc_constraint(:account)
     |> foreign_key_constraint(:category_id)
   end
 
@@ -46,7 +46,7 @@ defmodule Ekmi.Keihi.Budget do
         :receipt_img
       ])
       |> validate_required([:title, :description, :cost, :category_id, :created_at])
-      |> assoc_constraint(:user)
+      |> assoc_constraint(:account)
       |> foreign_key_constraint(:category_id)
 
     attrs_recipt_img = attrs["receipt_img"] || []

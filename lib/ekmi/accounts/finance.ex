@@ -10,7 +10,7 @@ defmodule Ekmi.Accounts.Finance do
     field :balance, :integer, default: 200_000
     field :currency, :string
     field :scheduled_deposit_amount, :integer
-    belongs_to :user, Ekmi.Accounts.User
+    belongs_to :account, Ekmi.Accounts.Account
 
     timestamps()
   end
@@ -18,10 +18,10 @@ defmodule Ekmi.Accounts.Finance do
   @doc false
   def changeset(finance, attrs) do
     finance
-    |> cast(attrs, [:balance, :currency, :scheduled_deposit_amount, :user_id])
-    |> validate_required([:balance, :currency, :scheduled_deposit_amount, :user_id])
+    |> cast(attrs, [:balance, :currency, :scheduled_deposit_amount, :account_id])
+    |> validate_required([:balance, :currency, :scheduled_deposit_amount, :account_id])
     |> validate_length(:currency, min: 3, max: 3)
-    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:account_id)
   end
 
   def balance_changeset(finance, attrs) do

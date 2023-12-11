@@ -3,6 +3,7 @@ defmodule Ekmi.Keihi.Queries do
 
   import Ecto.Query
   alias Ekmi.Accounts.User
+  alias Ekmi.Accounts.Account
   alias Ekmi.Keihi.Budget
   alias Ekmi.Repo
 
@@ -10,6 +11,29 @@ defmodule Ekmi.Keihi.Queries do
     from b in Budget,
       where: b.user_id == ^user_id and b.id == ^budget_id,
       preload: [:category]
+  end
+
+  def where_account_and_budget_ids(%{account_id: account_id, budget_id: budget_id}) do
+    from b in Budget,
+      where: b.account_id == ^account_id and b.id == ^budget_id,
+      preload: [:category]
+  end
+
+  def where_account(%Account{} = account) do
+    case account
+         |> Repo.preload(:partner_relation)
+         |> Map.get(:partner_relation) do
+      nil ->
+        from b in Budget,
+          where: b.account_id == ^account.id,
+          preload: [:category]
+
+      partner_relation ->
+        from b in Budget,
+          where:
+            b.account_id == ^account.id or b.account_id == ^partner_relation.partner_account_id,
+          preload: [:category]
+    end
   end
 
   def where_user(%User{} = user) do

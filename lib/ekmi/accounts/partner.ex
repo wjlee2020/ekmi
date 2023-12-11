@@ -6,18 +6,18 @@ defmodule Ekmi.Accounts.Partner do
 
   schema "partners" do
     field :balance, :integer
-    belongs_to :user, Ekmi.Accounts.User
-    belongs_to :partner, Ekmi.Accounts.User
+    belongs_to :account, Ekmi.Accounts.Account, foreign_key: :account_id
+    belongs_to :partner_account, Ekmi.Accounts.Account, foreign_key: :partner_account_id
 
     timestamps()
   end
 
   def changeset(partner, attrs) do
     partner
-    |> cast(attrs, [:user_id, :partner_id, :balance])
-    |> validate_required([:user_id, :partner_id, :balance])
-    |> assoc_constraint(:user)
-    |> foreign_key_constraint(:partner_id)
+    |> cast(attrs, [:account_id, :partner_account_id, :balance])
+    |> validate_required([:account_id, :partner_account_id, :balance])
+    |> assoc_constraint(:account)
+    |> foreign_key_constraint(:partner_account_id)
   end
 
   def partner_balance_changeset(partner, attrs) do
