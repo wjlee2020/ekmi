@@ -30,7 +30,8 @@ defmodule Ekmi.Keihi.Queries do
 
       partner_relation ->
         from b in Budget,
-          where: b.account_id == ^account.id or b.account_id == ^partner_relation.partner_id,
+          where:
+            b.account_id == ^account.id or b.account_id == ^partner_relation.partner_account_id,
           preload: [:category]
     end
   end

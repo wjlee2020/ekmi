@@ -603,22 +603,22 @@ defmodule Ekmi.Accounts do
       {:ok, %Ekmi.Accounts.Finance{}}
 
   """
-  def update_finance(%{user_id: user_id, attrs: attrs}) do
-    get_finance(%{user_id: user_id})
+  def update_finance(%{account_id: account_id, attrs: attrs}) do
+    get_finance(%{account_id: account_id})
     |> change_finance(attrs)
     |> Repo.update()
   end
 
-  def update_finance(%User{} = user, attrs) do
-    user = Repo.preload(user, :partner_relation)
+  def update_finance(%Account{} = account, attrs) do
+    account = Repo.preload(account, :partner_relation)
 
     Multi.new()
     |> Multi.update(:update_user_balance, fn _repo ->
-      get_finance(%{user_id: user.id})
+      get_finance(%{account_id: account.id})
       |> change_finance(attrs)
     end)
     |> Multi.update(:update_partner_rel_balance, fn _repo ->
-      request_partner_change(user.partner_relation, attrs)
+      request_partner_change(account.partner_relation, attrs)
     end)
   end
 
@@ -639,8 +639,8 @@ defmodule Ekmi.Accounts do
   """
   @spec update_balance_by_scheduled_deposit_amount(integer()) ::
           {:ok, finance()} | {:error, ecto_changeset()}
-  def update_balance_by_scheduled_deposit_amount(user_id) do
-    finance = get_finance(%{user_id: user_id})
+  def update_balance_by_scheduled_deposit_amount(account_id) do
+    finance = get_finance(%{account_id: account_id})
     new_balance = finance.balance + finance.scheduled_deposit_amount
 
     finance
@@ -659,9 +659,9 @@ defmodule Ekmi.Accounts do
       - nil if no finance found for the user.
 
   """
-  @spec get_finance(%{:user_id => integer()}) :: finance() | term()
-  def get_finance(%{user_id: user_id}) do
-    Repo.get_by!(Finance, user_id: user_id)
+  @spec get_finance(%{:account_id => integer()}) :: finance() | term()
+  def get_finance(%{account_id: account_id}) do
+    Repo.get_by!(Finance, account_id: account_id)
   end
 
   @doc """
@@ -675,15 +675,15 @@ defmodule Ekmi.Accounts do
           - if user has a partner, it returns the partner_relation finance balance
 
   """
-  @spec get_balance(User.t()) :: integer()
-  def get_balance(%User{} = user) do
-    case user.has_partner do
+  @spec get_balance(Account.t()) :: integer()
+  def get_balance(%Account{} = account) do
+    case account.has_partner do
       true ->
-        %{partner_relation: %{balance: balance}} = Repo.preload(user, :partner_relation)
+        %{partner_relation: %{balance: balance}} = Repo.preload(account, :partner_relation)
         balance
 
       false ->
-        get_finance(%{user_id: user.id}).balance
+        get_finance(%{account_id: account.id}).balance
     end
   end
 

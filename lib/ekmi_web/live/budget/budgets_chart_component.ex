@@ -13,7 +13,7 @@ defmodule EkmiWeb.BudgetsChartComponent do
 
   @impl true
   def render(assigns) do
-    budgets = Keihi.list_budgets(assigns.current_user)
+    budgets = Keihi.list_budgets_by_account(assigns.current_user)
     {total_count, total_budget_cost} = Keihi.budget_count_and_total(budgets)
     {:ok, total_budget_cost} = Cldr.Number.to_string(total_budget_cost)
 

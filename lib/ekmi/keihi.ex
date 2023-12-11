@@ -136,6 +136,8 @@ defmodule Ekmi.Keihi do
   end
 
   def list_budgets_by_account(%Account{} = account, options) when is_map(options) do
+    IO.inspect(account)
+
     Queries.where_account(account)
     |> Queries.sort(options)
     |> Queries.paginate(options)
@@ -231,9 +233,9 @@ defmodule Ekmi.Keihi do
       iex> Ekmi.Keihi.get_budget_count_and_total(%User{user: 1}, %{sort: :desc, page: 2})
       {3, 5000}
   """
-  @spec get_budget_count_and_total(User.t(), map()) :: {integer(), integer()}
-  def get_budget_count_and_total(%User{} = user, options) when is_map(options) do
-    list_budgets(user, options)
+  @spec get_budget_count_and_total(Account.t(), map()) :: {integer(), integer()}
+  def get_budget_count_and_total(%Account{} = user, options) when is_map(options) do
+    list_budgets_by_account(user, options)
     |> budget_count_and_total()
   end
 
