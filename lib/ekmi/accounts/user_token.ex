@@ -66,6 +66,16 @@ defmodule Ekmi.Accounts.UserToken do
     {:ok, query}
   end
 
+  def verify_session_token_for_account_query(token) do
+    query =
+      from token in token_and_context_query(token, "session"),
+        join: user in assoc(token, :user),
+        join: account in assoc(user, :account),
+        select: account
+
+    {:ok, query}
+  end
+
   @doc """
   Builds a token and its hash to be delivered to the user's email.
 

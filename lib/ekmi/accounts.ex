@@ -350,6 +350,11 @@ defmodule Ekmi.Accounts do
     Repo.one(query)
   end
 
+  def get_user_account_by_session_token(token) do
+    {:ok, query} = UserToken.verify_session_token_for_account_query(token)
+    Repo.one(query)
+  end
+
   @doc """
   Deletes the signed token with the given context.
   """
@@ -528,15 +533,15 @@ defmodule Ekmi.Accounts do
 
       user_one_partner_change =
         request_partner_change(%Partner{}, %{
-          user_id: user_one.id,
-          partner_id: user_two.id,
+          account_id: user_one.id,
+          partner_account_id: user_two.id,
           balance: total_balance
         })
 
       user_two_partner_change =
         request_partner_change(%Partner{}, %{
-          user_id: user_two.id,
-          partner_id: user_one.id,
+          account_id: user_two.id,
+          partner_account_id: user_one.id,
           balance: total_balance
         })
 

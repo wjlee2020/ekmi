@@ -96,6 +96,12 @@ defmodule EkmiWeb.UserAuth do
     assign(conn, :current_user, user)
   end
 
+  def fetch_current_account(conn, _opts) do
+    {user_token, conn} = ensure_user_token(conn)
+    account = user_token && Accounts.get_user_account_by_session_token(user_token)
+    assign(conn, :current_account, account)
+  end
+
   defp ensure_user_token(conn) do
     if token = get_session(conn, :user_token) do
       {token, conn}
@@ -177,7 +183,7 @@ defmodule EkmiWeb.UserAuth do
   defp mount_current_user(socket, session) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
       if user_token = session["user_token"] do
-        Accounts.get_user_by_session_token(user_token)
+        Accounts.get_user_account_by_session_token(user_token)
       end
     end)
   end

@@ -14,10 +14,10 @@ defmodule Ekmi.Accounts.Partner do
 
   def changeset(partner, attrs) do
     partner
-    |> cast(attrs, [:user_id, :partner_id, :balance])
-    |> validate_required([:user_id, :partner_id, :balance])
-    |> assoc_constraint(:user)
-    |> foreign_key_constraint(:partner_id)
+    |> cast(attrs, [:account_id, :partner_account_id, :balance])
+    |> validate_required([:account_id, :partner_account_id, :balance])
+    |> assoc_constraint(:account)
+    |> foreign_key_constraint(:partner_account_id)
   end
 
   def partner_balance_changeset(partner, attrs) do
