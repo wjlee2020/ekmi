@@ -713,16 +713,14 @@ defmodule Ekmi.Accounts do
       |> hd()
   end
 
-  defp is_requested_partner(%{partner_requested: partner_requested} = user) do
-    IO.inspect(user)
-
+  defp is_requested_partner(%{partner_requested: partner_requested} = account) do
     case partner_requested do
       true ->
-        user = Repo.preload(user, [:finance, :partner_relation])
-        {:ok, user}
+        account = Repo.preload(account, [:finance, :partner_relation])
+        {:ok, account}
 
       false ->
-        {:error, "#{user.email} has no partner reqeusted"}
+        {:error, "#{account.email} has no partner reqeusted"}
     end
   end
 end

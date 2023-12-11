@@ -24,7 +24,7 @@ defmodule EkmiWeb.BudgetsLive do
       socket
       |> assign(
         username: Accounts.current_username(socket.assigns.current_user),
-        user_id: socket.assigns.current_user.id
+        account_id: socket.assigns.current_user.id
       )
       |> allow_upload(
         :receipt_img,

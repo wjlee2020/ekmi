@@ -9,7 +9,7 @@
     id={:new}
     live_action={@live_action}
     balance={@balance}
-    user_id={@user_id}
+    account_id={@account_id}
     selected_budget={@selected_budget}
     options={@options}
     uploads={@uploads}
@@ -62,7 +62,7 @@
       patch={~p"/budgets/#{budget}?#{@options}"}
       class="w-full sm:w-fit"
     >
-      <Budgets.Components.tiles budget={budget} user_id={@user_id} />
+      <Budgets.Components.tiles budget={budget} account_id={@account_id} />
     </.link>
   </div>
 <% end %>
