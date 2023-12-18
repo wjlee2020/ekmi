@@ -31,7 +31,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
           phx-submit="save"
           phx-target={@myself}
         >
-          <.input type="hidden" field={@budget_form[:user_id]} value={@user_id} />
+          <.input type="hidden" field={@budget_form[:account_id]} value={@account_id} />
           <.input
             label="Title"
             field={@budget_form[:title]}
@@ -126,7 +126,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
           phx-submit="update"
           phx-target={@myself}
         >
-          <.input type="hidden" field={@budget_form[:user_id]} value={@user_id} />
+          <.input type="hidden" field={@budget_form[:account_id]} value={@account_id} />
           <.input type="hidden" field={@budget_form[:id]} value={@selected_budget.id} />
           <.input
             label="Title"
@@ -341,7 +341,7 @@ defmodule EkmiWeb.BudgetsFormComponent do
         "description" => budget["description"],
         "id" => budget["id"],
         "title" => budget["title"],
-        "user_id" => budget["user_id"],
+        "account_id" => budget["account_id"],
         "receipt_img" => socket.assigns.selected_budget.receipt_img ++ receipt_img
     }
 
