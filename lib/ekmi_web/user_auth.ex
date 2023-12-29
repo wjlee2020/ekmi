@@ -93,12 +93,14 @@ defmodule EkmiWeb.UserAuth do
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     user = user_token && Accounts.get_user_account_by_session_token(user_token)
+    IO.puts("ran here")
     assign(conn, :current_user, user)
   end
 
   def fetch_current_account(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     account = user_token && Accounts.get_user_account_by_session_token(user_token)
+    IO.puts("ran in fetch current account")
     assign(conn, :current_account, account)
   end
 

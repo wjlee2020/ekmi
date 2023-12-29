@@ -47,19 +47,19 @@ defmodule EkmiWeb.UserSettingsLive do
   end
 
   def mount(_params, _session, socket) do
-    user = socket.assigns.current_user
-    user_changeset = Accounts.change_delete_user(user)
-    email_changeset = Accounts.change_user_email(user)
-    name_change = Accounts.change_user_detail(user)
-    password_changeset = Accounts.change_user_password(user)
-    finance = Accounts.get_finance(%{user_id: user.id})
+    user_account = socket.assigns.current_user
+    user_changeset = Accounts.change_delete_user(user_account)
+    email_changeset = Accounts.change_user_email(user_account)
+    name_change = Accounts.change_user_detail(user_account)
+    password_changeset = Accounts.change_user_password(user_account)
+    finance = Accounts.get_finance(%{account_id: user_account.id})
     finance_changeset = Accounts.change_finance(finance)
 
     socket =
       socket
       |> assign(:current_password, nil)
       |> assign(:email_form_current_password, nil)
-      |> assign(:current_email, user.email)
+      |> assign(:current_email, user_account.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:finance_form, to_form(finance_changeset))
@@ -97,7 +97,10 @@ defmodule EkmiWeb.UserSettingsLive do
   def handle_event("update_balance", params, socket) do
     %{"finance" => finance_params} = params
 
-    case Accounts.update_finance(%{user_id: finance_params["user_id"], attrs: finance_params}) do
+    case Accounts.update_finance(%{
+           account_id: finance_params["account_id"],
+           attrs: finance_params
+         }) do
       {:ok, finance} ->
         finance_changeset = Accounts.change_finance(finance)
 

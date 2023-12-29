@@ -18,9 +18,6 @@ defmodule Ekmi.Accounts.User do
     field :requested_by, :string
 
     has_one :account, Ekmi.Accounts.Account
-    has_one :finance, Ekmi.Accounts.Finance
-    has_one :partner_relation, Ekmi.Accounts.Partner
-    has_many :budgets, Ekmi.Keihi.Budget
 
     timestamps()
   end
