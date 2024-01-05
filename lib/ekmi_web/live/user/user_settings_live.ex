@@ -166,7 +166,7 @@ defmodule EkmiWeb.UserSettingsLive do
     end
   end
 
-  def handle_event("update_name", %{"user" => user_params}, socket) do
+  def handle_event("update_name", %{"account" => user_params}, socket) do
     case Accounts.update_user_detail(socket.assigns.current_user, user_params) do
       {:ok, user} ->
         user_changeset = Accounts.change_user_detail(user)
@@ -183,7 +183,7 @@ defmodule EkmiWeb.UserSettingsLive do
     end
   end
 
-  def handle_event("validate_name", %{"user" => user_params}, socket) do
+  def handle_event("validate_name", %{"account" => user_params}, socket) do
     user_form =
       socket.assigns.current_user
       |> Accounts.change_user_detail(user_params)

@@ -210,11 +210,12 @@ defmodule Ekmi.Accounts do
     User.email_changeset(user, attrs, validate_email: false)
   end
 
-  def change_user_detail(%User{} = user, attrs \\ %{}) do
-    User.name_changeset(user, attrs)
+  def change_user_detail(%Account{} = account, attrs \\ %{}) do
+    Account.name_changeset(account, attrs)
   end
 
-  def change_delete_user(%User{} = user, attrs \\ %{}) do
+  def change_delete_user(%Account{} = account, attrs \\ %{}) do
+    user = Repo.get(User, account.user_id)
     User.delete_user_changeset(user, attrs)
   end
 
@@ -299,7 +300,8 @@ defmodule Ekmi.Accounts do
       %Ecto.Changeset{data: %User{}}
 
   """
-  def change_user_password(user, attrs \\ %{}) do
+  def change_user_password(%Account{} = account, attrs \\ %{}) do
+    user = Repo.get(User, account.user_id)
     User.password_changeset(user, attrs, hash_password: false)
   end
 

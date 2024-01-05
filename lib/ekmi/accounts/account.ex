@@ -35,6 +35,12 @@ defmodule Ekmi.Accounts.Account do
     |> validate_required([:name, :has_partner])
   end
 
+  def name_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name])
+    |> validate_length(:name, min: 3)
+  end
+
   def register_account_changeset(account, attrs) do
     account
     |> cast(attrs, [:name, :user_id])
